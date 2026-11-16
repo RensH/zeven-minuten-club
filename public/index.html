@@ -569,6 +569,7 @@ async function join(name){
 const W = window.ZMC_EX;
 const prefs = {focus:"mix", nojump:false, sound:true, voice:"en", music:"off"};
 try{ Object.assign(prefs, JSON.parse(localStorage.getItem("zmc-prefs")||"{}")); }catch(e){}
+if(prefs.music==="lofi") prefs.music="energy";
 function setPref(k,v){ prefs[k]=v; try{ localStorage.setItem("zmc-prefs",JSON.stringify(prefs)); }catch(e){} }
 let variant=0;
 const CATN = W.CAT;
@@ -680,10 +681,7 @@ const soundIcon=()=>prefs.sound
 const mtof=m=>440*Math.pow(2,(m-69)/12);
 const MUSIC={
   off:{label:"Uit"},
-  energy:{label:"Energiek", bpm:128, prog:[[57,60,64],[53,57,60],[48,52,55],[55,59,62]],
-    kick:[0,4,8,12], clap:[4,12], hat:[2,6,10,14], bass:"eighths", bassWave:"sawtooth", stab:[0,3,6,10], stabWave:"sawtooth"},
-  lofi:{label:"Lo-fi", bpm:84, swing:0.12, prog:[[50,53,57,60],[55,59,62,65],[48,52,55,59],[45,48,52,55]],
-    kick:[0,7,10], snare:[4,12], hat:[0,2,4,6,8,10,12,14], bass:"roots", bassWave:"triangle", pad:true},
+  energy:{label:"Energiek", bpm:138, custom:energyStep},
   chip:{label:"8-bit", bpm:140, prog:[[60,64,67],[55,59,62],[57,60,64],[53,57,60]],
     kick:[0,8], hat:[2,6,10,14], bass:"quarters", bassWave:"square", arp:true}
 };
@@ -703,7 +701,60 @@ function drum(kind,t){
   else { f.type="bandpass"; f.frequency.value=kind==="clap"?1500:1800; env(g,t,kind==="clap"?0.35:0.3,0.002,0.14); }
   n.connect(f).connect(g).connect(musicBus); n.start(t); n.stop(t+0.25);
 }
+/* Energiek: een nummer van 32 maten dat steeds verandert:
+   groove -> melodie -> opbouw met roffel en ruis -> drop. Elke ronde in een andere toonsoort. */
+const E_PROG=[[[57,60,64],[53,57,60],[48,52,55],[55,59,62]], [[53,57,60],[55,59,62],[52,55,59],[57,60,64]]];
+const E_LEAD=[[0,null,2,null,1,null,2,3,null,2,null,1,0,null,null,null],[2,null,2,3,null,2,1,null,0,null,1,2,null,1,0,null],[3,2,1,2,null,1,0,null,1,null,2,null,3,null,4,null]];
+const E_KEYS=[0,3,-2,5];
+function energyStep(st,step,t){
+  const b16=60/st.bpm/4, bar=Math.floor(step/16), s=step%16, sec=Math.floor(bar/8)%4, bIn=bar%8, round=Math.floor(bar/32);
+  const tr=E_KEYS[round%E_KEYS.length], prog=E_PROG[(sec===1||(sec===3&&bIn>=4))?1:0], ch=prog[bar%4].map(m=>m+tr), root=ch[0]-12;
+  const fill = bIn%4===3 && s>=12;
+  // drums
+  if(sec!==2){
+    if(s%4===0 && !fill) drum("kick",t);
+    if((s===4||s===12) && !fill) drum("clap",t);
+    if(fill) drum("snare",t);
+  } else { // opbouw: kick vervalt aan het eind, roffel wordt steeds sneller
+    if(bIn<6 && s%4===0) drum("kick",t);
+    const every = bIn<2?8 : bIn<4?4 : bIn<6?2 : 1;
+    if(s%every===0){ drum("snare",t); if(bIn>=6) drum("clap",t); }
+    if(bIn===0 && s===0) riser(t,b16*16*8);
+  }
+  if(sec===0 && s%4===2) drum("hat",t);
+  if((sec===1||sec===3) && s%2===0) drum("hat",t);
+  if(sec===3 && s%4===2) drum("hat",t+b16*0.5);
+  if(sec===3 && bIn===0 && s===0) crash(t);
+  // bas
+  if(sec===0 && s%2===0) tone(mtof(s%4===2?root+12:root),t,b16*1.5,"sawtooth",0.14,900);
+  if(sec===1 && s%4===2) tone(mtof(root),t,b16*1.8,"sawtooth",0.18,700);
+  if(sec===2 && s%4===0) tone(mtof(root),t,b16*3,"sawtooth",0.12,500+bIn*150);
+  if(sec===3) tone(mtof(s%8===6?root+12:root),t,b16*0.9,"sawtooth",0.13,1200);
+  // akkoorden
+  if(sec===0 && [0,3,6,10].includes(s)) ch.forEach(m=>tone(mtof(m+12),t,b16*1.2,"sawtooth",0.03,2400));
+  if(sec===1 && s===0) ch.forEach(m=>tone(mtof(m+12),t,b16*15,"triangle",0.045,1800));
+  if(sec===3 && s%4===2) ch.forEach(m=>tone(mtof(m+12),t,b16*1.4,"sawtooth",0.035,3200));
+  // melodie
+  if(sec===1||sec===3){
+    const pat=E_LEAD[(bar+(sec===3?1:0))%E_LEAD.length], n=pat[s];
+    if(n!=null){ const tones=[ch[0],ch[1],ch[2],ch[0]+12,ch[1]+12]; tone(mtof(tones[n]+12),t,b16*1.6,sec===3?"square":"triangle",sec===3?0.04:0.06,3600); }
+  }
+  if(sec===2 && bIn>=4 && s%2===0) tone(mtof(ch[(s/2)%3]+24),t,b16*0.8,"square",0.02+bIn*0.005,4000);
+}
+function riser(t,dur){
+  const a=actx, n=a.createBufferSource(), f=a.createBiquadFilter(), g=a.createGain();
+  n.buffer=noise(); n.loop=true; f.type="bandpass"; f.Q.value=2;
+  f.frequency.setValueAtTime(400,t); f.frequency.exponentialRampToValueAtTime(9000,t+dur);
+  g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.45,t+dur*0.97); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  n.connect(f).connect(g).connect(musicBus); n.start(t); n.stop(t+dur+0.05);
+}
+function crash(t){
+  const a=actx, n=a.createBufferSource(), f=a.createBiquadFilter(), g=a.createGain();
+  n.buffer=noise(); n.loop=true; f.type="highpass"; f.frequency.value=4000; env(g,t,0.22,0.005,1.6);
+  n.connect(f).connect(g).connect(musicBus); n.start(t); n.stop(t+1.7);
+}
 function scheduleStep(st,step,t){
+  if(st.custom) return st.custom(st,step,t);
   const bar=Math.floor(step/16)%st.prog.length, s=step%16, ch=st.prog[bar], b16=60/st.bpm/4;
   if(st.kick&&st.kick.includes(s)) drum("kick",t);
   if(st.snare&&st.snare.includes(s)) drum("snare",t);
@@ -880,7 +931,7 @@ function drawPhase(){
   const fig=W.makeFigure(ex); $("#tfig").insertBefore(fig,$("#countbig")); W.animate(fig);
 }
 function cycleMusic(){
-  const order=["off","energy","lofi","chip"], i=order.indexOf(prefs.music||"off"), nx=order[(i+1)%order.length];
+  const order=["off","energy","chip"], i=order.indexOf(prefs.music||"off"), nx=order[(i+1)%order.length];
   setPref("music",nx); if(T&&!T.paused) startMusic(nx);
   const b=$("[data-tmusic] span"); if(b) b.textContent=MUSIC[nx].label;
 }
