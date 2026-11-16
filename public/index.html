@@ -235,6 +235,48 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--sky);outline-of
 .ring .t{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:40px}
 .tctrl{display:flex;flex-direction:column;gap:8px}
 .upnext{font-size:13px;font-weight:700;color:var(--muted)}
+
+/* aftellen, muziek, beloning */
+.tfig{position:relative}
+.countbig{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:110px;line-height:1;color:var(--flame);pointer-events:none;opacity:0;text-shadow:0 4px 0 color-mix(in srgb,var(--flame) 40%,transparent)}
+.countbig.go{animation:countpop .9s ease-out both}
+@keyframes countpop{0%{opacity:0;transform:scale(1.8)}15%{opacity:1;transform:scale(1)}70%{opacity:.95}100%{opacity:0;transform:scale(.85)}}
+.iconbtn.wide{width:auto;padding:0 10px;gap:6px;display:flex;align-items:center;font-weight:800;font-size:13px;color:var(--fg)}
+.exen{font-size:13px;font-weight:700;color:var(--muted);margin-top:-4px}
+.setrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.setl{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);width:56px}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.fchip.sm{padding:6px 12px;font-size:13px}
+.results{gap:14px}
+.results .small{font-size:13px}
+.xpwin{display:flex;align-items:baseline;justify-content:center;gap:6px;color:var(--gold-deep)}
+.xpwin b{font-family:var(--display);font-size:52px;line-height:1}
+.xpwin span{font-weight:800;font-size:18px}
+:root[data-theme="dark"] .xpwin{color:var(--gold)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .xpwin{color:var(--gold)}}
+.xpsplit{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:-8px}
+.xpsplit span{font-size:12px;font-weight:800;padding:3px 10px;border-radius:999px;background:var(--gold-soft);color:var(--fg)}
+.lvl{width:100%;display:flex;flex-direction:column;gap:6px;text-align:left}
+.lvlh{display:flex;justify-content:space-between;gap:8px;font-size:13px;font-weight:700;color:var(--muted)}
+.lvlh b{color:var(--fg)}
+.lvlbar{height:14px;border-radius:999px;background:var(--miss);overflow:hidden}
+.lvlbar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--gold),var(--flame))}
+.lvlup{align-self:center;font-family:var(--display);font-weight:800;font-size:20px;color:var(--flame);animation:pop .5s cubic-bezier(.3,1.6,.5,1) both}
+.rstats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;width:100%}
+.rstats>div{border:2px solid var(--line);border-radius:16px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:2px}
+.rstats b{font-family:var(--display);font-size:24px;line-height:1}
+.rstats span{font-size:12px;font-weight:700;color:var(--muted)}
+.badges{width:100%;display:flex;flex-direction:column;gap:8px;text-align:left}
+.bh{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.badge2{display:flex;align-items:center;gap:10px;border:2px solid var(--line);border-radius:14px;padding:8px 10px;animation:pop .5s cubic-bezier(.3,1.6,.5,1) both}
+.badge2 div{display:flex;flex-direction:column;min-width:0;flex:1}
+.badge2 b{font-size:14px}
+.badge2 span{font-size:12px;color:var(--muted);font-weight:600}
+.badge2 em{font-style:normal;font-size:11px;font-weight:800;color:#fff;background:var(--flame);padding:2px 8px;border-radius:999px}
+.badge.lv{background:color-mix(in srgb,var(--sky) 15%,var(--surface));color:var(--sky-deep)}
+:root[data-theme="dark"] .badge.lv{color:var(--sky)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .badge.lv{color:var(--sky)}}
+#celebrate{overflow-y:auto}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 html,body{margin:0}
@@ -405,6 +447,7 @@ function renderHero(){
       <div class="stat flame">${flameSvg(34)}<div><b class="num">${s.streak}</b><span>dagen streak</span></div></div>
       <div class="stat gold">${s.perfect?crownSvg(34):`<svg width="34" height="34" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="var(--line)" stroke-width="3"/><circle cx="12" cy="12" r="9" fill="none" stroke="var(--gold)" stroke-width="3" stroke-dasharray="${(s.pct/100*56.5).toFixed(1)} 56.5" transform="rotate(-90 12 12)" stroke-linecap="round"/></svg>`}<div><b class="num">${s.pct}%</b><span>${s.perfect?"niets gemist":s.missed+" "+(s.missed===1?"dag":"dagen")+" gemist"}</span></div></div>
     </div>
+    ${(()=>{ const x=xpOf(p), L=levelOf(x); return `<div class="lvl"><div class="lvlh"><b>Level ${L.n} · ${L.title}</b><span class="num">${x} / ${L.hi} XP</span></div><div class="lvlbar"><i style="width:${(L.pct*100).toFixed(1)}%"></i></div></div>`; })()}
     ${action}
     <div class="weekbox">${weekNav}<div class="week">${week.join("")}</div></div>
     <p class="hint">Vergeten af te vinken? Tik op de dag. Met de pijlen blader je terug naar eerdere weken.</p>`;
@@ -426,7 +469,7 @@ function renderBoard(){
       <span class="rank num">${i+1}</span>
       <span class="av" style="background:${colorOf(p)}">${initial(p.name)}${s.doneToday?`<span class="ok" title="Vandaag gedaan">${checkSvg(11)}</span>`:""}</span>
       <div class="minfo">
-        <div class="mname"><span class="n">${esc(p.name)}</span>${s.perfect?`<span class="badge perfect">${crownSvg(12)}100%</span>`:`<span class="badge pct num">${s.pct}%</span>`}</div>
+        <div class="mname"><span class="n">${esc(p.name)}</span><span class="badge lv num">Lv ${levelOf(xpOf(p)).n}</span>${s.perfect?`<span class="badge perfect">${crownSvg(12)}100%</span>`:`<span class="badge pct num">${s.pct}%</span>`}</div>
         <div class="strip" aria-label="Vorige en deze week, maandag tot zondag">${strip}</div>
       </div>
       <div class="mstreak ${s.streak?"":"cold"}">${flameSvg(22,s.streak?"var(--flame)":"var(--line)")}<b class="num">${s.streak}</b><small>${s.streak===1?"dag":"dagen"}</small></div>
@@ -457,33 +500,59 @@ async function setDay(k,val){
   if(busy) return; busy=true;
   const p=people.find(x=>x.id===me); if(!p){busy=false;return;}
   const prev = p.days ? p.days[k] : undefined;
-  p.days = Object.assign({},p.days,{[k]:val}); render();
+  p.days = Object.assign({},p.days,{[k]:val}); if(seenDone&&k===todayKey()){ val?seenDone.add(p.id):seenDone.delete(p.id); } render();
   try{ const upd=await api("people/"+encodeURIComponent(p.id)+"/day",{method:"POST",body:JSON.stringify({date:k,done:val})}); Object.assign(p,upd); }
   catch(e){ p.days = Object.assign({},p.days,{[k]:prev}); render(); failWrite(e); busy=false; return false; }
   busy=false; return true;
 }
-async function markToday(){
-  const ok = await setDay(todayKey(),true);
-  if(ok!==false) celebrate();
-}
-function celebrate(){
+async function markToday(sum){
   const p=people.find(x=>x.id===me); if(!p) return;
-  const s=stats(p);
+  const xpBefore=xpOf(p), firstToday=!people.some(x=>x.id!==p.id && isDone(x,todayKey()));
+  const ok = await setDay(todayKey(),true);
+  if(ok!==false) celebrate(sum||null,false,xpBefore,firstToday);
+}
+function celebrate(sum, extra=false, xpBefore=null, firstToday=false){
+  const p=people.find(x=>x.id===me); if(!p) return;
+  const s=stats(p), xpNow=xpOf(p), xb=xpBefore==null?xpNow:xpBefore, gained=extra?0:xpNow-xb;
+  const lvB=levelOf(xb), lv=levelOf(xpNow), up=lv.n>lvB.n;
+  const badges=extra?[]:badgesFor(p,sum,firstToday);
+  const t=todayKey(), doneN=people.filter(x=>isDone(x,t)).length, left=people.filter(x=>!isDone(x,t)).map(x=>x.name);
+  const order=["","1e","2e","3e","4e","5e","6e","7e","8e"];
   const msgs=["Lekker bezig","Sterk werk","Zo doe je dat","Kampioen"];
+  const mm=sum?`${Math.floor(sum.secs/60)}:${String(sum.secs%60).padStart(2,"0")}`:"";
   const ov=$("#celebrate");
-  ov.innerHTML=`<div class="panel" role="dialog" aria-modal="true" aria-labelledby="celh">
-    <div class="bigflame">${flameSvg(96)}</div>
-    <div class="bigstreak num">${s.streak}</div>
-    <h2 id="celh">${msgs[Math.floor(Math.random()*msgs.length)]}, ${esc(p.name)}!</h2>
-    <p>${s.streak===1?"Dag 1 van je streak staat erop.":`Al ${s.streak} dagen op rij.`} ${s.perfect?"Nog geen dag gemist: 100%!":""}</p>
+  ov.innerHTML=`<div class="panel results" role="dialog" aria-modal="true" aria-labelledby="celh">
+    <div class="bigflame">${trophySvg(84)}</div>
+    <div><h2 id="celh">${extra?"Extra workout gedaan!":"Workout voltooid!"}</h2>
+    <p>${msgs[Math.floor(Math.random()*msgs.length)]}, ${esc(p.name)}.</p></div>
+    ${extra?`<p class="small">Vandaag stond al afgevinkt. Deze telt als extra training.</p>`:`
+    <div class="xpwin"><b class="num" id="xpcount">+0</b><span>XP</span></div>
+    <div class="xpsplit"><span>Workout +100</span>${gained>100?`<span>Streakbonus +${gained-100}</span>`:""}</div>`}
+    <div class="lvl">
+      <div class="lvlh"><b>Level <span id="lvln">${lvB.n}</span> · <span id="lvlt">${lvB.title}</span></b><span class="num" id="lvlx">${xb} / ${lvB.hi} XP</span></div>
+      <div class="lvlbar"><i id="lvlfill" style="width:${(lvB.pct*100).toFixed(1)}%"></i></div>
+      <div class="lvlup" id="lvlup" hidden>Level omhoog!</div>
+    </div>
+    <div class="rstats">
+      <div>${flameSvg(26)}<b class="num">${s.streak}</b><span>${s.streak===1?"dag":"dagen"} op rij</span></div>
+      ${sum?`<div><b class="num">${sum.total-sum.skipped}/${sum.total}</b><span>oefeningen</span></div><div><b class="num">${mm}</b><span>minuten</span></div>`:`<div><b class="num">${s.pct}%</b><span>score</span></div>`}
+    </div>
+    ${badges.length?`<div class="badges"><div class="bh">Nieuwe badges</div>${badges.map(b=>`<div class="badge2">${medalSvg}<div><b>${esc(b[0])}</b><span>${esc(b[1])}</span></div><em>Nieuw</em></div>`).join("")}</div>`:""}
+    <p class="small">${extra?"":`Jij bent de ${order[doneN]||doneN+"e"} van ${people.length} vandaag.`} ${left.length?`Nog te gaan: ${left.map(esc).join(", ")}.`:"Iedereen is klaar vandaag!"}</p>
     <button class="btn" data-close style="width:100%">Doorgaan</button></div>`;
   ov.hidden=false; ov.querySelector("[data-close]").focus();
-  if(typeof confetti==="function" && !matchMedia("(prefers-reduced-motion: reduce)").matches){
-    const c=["#4CB81B","#FF8A1F","#F5B700","#1CA8E8","#CE82FF"];
-    confetti({particleCount:140,spread:80,origin:{y:.6},colors:c,zIndex:100});
-    setTimeout(()=>confetti({particleCount:60,angle:60,spread:60,origin:{x:0,y:.7},colors:c,zIndex:100}),250);
-    setTimeout(()=>confetti({particleCount:60,angle:120,spread:60,origin:{x:1,y:.7},colors:c,zIndex:100}),400);
-  }
+  fireConfetti();
+  // XP optellen en levelbalk laten vollopen
+  const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches, t0=performance.now(), dur=reduce?1:1400;
+  const step=now=>{
+    const k=Math.min(1,(now-t0)/dur), e=1-Math.pow(1-k,3), x=Math.round(xb+gained*e), L=levelOf(x);
+    const c=$("#xpcount"); if(c) c.textContent="+"+Math.round(gained*e);
+    const f=$("#lvlfill"); if(f) f.style.width=(L.pct*100).toFixed(1)+"%";
+    const n=$("#lvln"); if(n) n.textContent=L.n; const tt=$("#lvlt"); if(tt) tt.textContent=L.title; const lx=$("#lvlx"); if(lx) lx.textContent=`${x} / ${L.hi} XP`;
+    if(k<1) requestAnimationFrame(step);
+    else if(up){ const u=$("#lvlup"); if(u){ u.hidden=false; beep(1318,0.25); setTimeout(()=>beep(1568,0.4),180); } }
+  };
+  if(!extra) requestAnimationFrame(step);
 }
 async function join(name){
   name=(name||"").trim().replace(/\s+/g," ");
@@ -498,7 +567,7 @@ async function join(name){
 
 /* ---------- workout van vandaag ---------- */
 const W = window.ZMC_EX;
-const prefs = {focus:"mix", nojump:false, sound:true};
+const prefs = {focus:"mix", nojump:false, sound:true, voice:"en", music:"off"};
 try{ Object.assign(prefs, JSON.parse(localStorage.getItem("zmc-prefs")||"{}")); }catch(e){}
 function setPref(k,v){ prefs[k]=v; try{ localStorage.setItem("zmc-prefs",JSON.stringify(prefs)); }catch(e){} }
 let variant=0;
@@ -523,6 +592,9 @@ function renderToday(){
       <span class="catlegend">${Object.entries(CATN).map(([k,v])=>`<span><i class="cat cat-${k}"></i>${v}</span>`).join("")}</span>
     </div>
     <ol class="exgrid" id="exgrid"></ol>
+    <div class="setrow"><span class="setl">Stem</span><div class="seg" role="group" aria-label="Stem">${[["en","Engels"],["nl","Nederlands"],["off","Uit"]].map(([k,l])=>`<button class="fchip sm" data-voice="${k}" aria-pressed="${(prefs.voice||"en")===k}">${l}</button>`).join("")}</div></div>
+    <div class="setrow"><span class="setl">Muziek</span><div class="seg" role="group" aria-label="Muziek">${Object.entries(MUSIC).map(([k,m])=>`<button class="fchip sm" data-music="${k}" aria-pressed="${(prefs.music||"off")===k}">${m.label}</button>`).join("")}</div></div>
+    <p class="needs" style="margin-top:-4px">Tik op een muziekstijl om 6 seconden te luisteren. De muziek wordt in je browser gemaakt, dus geen rechten of internet nodig.</p>
     <p class="needs">${needsText(list)} Tik op een oefening voor uitleg. Iedereen met dezelfde focus krijgt vandaag dezelfde workout.</p>
     <div class="todaybtns">
       <button class="btn" data-start>Start workout</button>
@@ -555,27 +627,150 @@ function openDetail(id){
 function closeDetail(){ const ov=$("#detail"); ov.hidden=true; ov.innerHTML=""; }
 $("#detail").addEventListener("click",e=>{ if(e.target.id==="detail") closeDetail(); });
 
-/* ---------- geluid ---------- */
-let actx=null;
+/* ---------- geluid: piepjes ---------- */
+let actx=null, musicBus=null;
+function ac(){
+  try{
+    if(!actx){ actx=new (window.AudioContext||window.webkitAudioContext)(); musicBus=actx.createGain(); musicBus.gain.value=0; musicBus.connect(actx.destination); }
+    if(actx.state==="suspended") actx.resume();
+  }catch(e){}
+  return actx;
+}
 function beep(freq=880,dur=0.12,vol=0.18){
   if(!prefs.sound) return;
   try{
-    actx = actx || new (window.AudioContext||window.webkitAudioContext)();
-    const o=actx.createOscillator(), g=actx.createGain(); o.type="sine"; o.frequency.value=freq;
-    g.gain.setValueAtTime(vol,actx.currentTime); g.gain.exponentialRampToValueAtTime(0.001,actx.currentTime+dur);
-    o.connect(g).connect(actx.destination); o.start(); o.stop(actx.currentTime+dur+0.02);
+    const a=ac(); const o=a.createOscillator(), g=a.createGain(); o.type="sine"; o.frequency.value=freq;
+    g.gain.setValueAtTime(vol,a.currentTime); g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+dur);
+    o.connect(g).connect(a.destination); o.start(); o.stop(a.currentTime+dur+0.02);
   }catch(e){}
 }
-let nlVoice=null;
-function pickVoice(){ try{ const v=speechSynthesis.getVoices(); nlVoice=v.find(x=>/^nl/i.test(x.lang))||null; }catch(e){} }
-try{ pickVoice(); speechSynthesis.onvoiceschanged=pickVoice; }catch(e){}
-function say(text){
-  if(!prefs.sound) return;
-  try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text); u.lang="nl-NL"; if(nlVoice) u.voice=nlVoice; u.rate=1.05; speechSynthesis.speak(u); }catch(e){}
+
+/* ---------- stem (Engels of Nederlands) ---------- */
+const VOICES={
+  en:{lang:"en-US", ready:n=>`Get ready. First up: ${n}.`, go:n=>`${n}. Go!`, rest:n=>`Rest. Next up: ${n}.`, side:"Switch sides!", count:["One","Two","Three"], half:"Halfway there!", done:"Workout complete. Great job!", last:"Last one. Give it everything!"},
+  nl:{lang:"nl-NL", ready:n=>`Maak je klaar. Eerste oefening: ${n}.`, go:n=>`${n}. Start!`, rest:n=>`Rust. Hierna: ${n}.`, side:"Wissel van kant!", count:["Een","Twee","Drie"], half:"Halverwege!", done:"Workout voltooid. Goed gedaan!", last:"Laatste oefening. Geef alles!"}
+};
+const V=()=>VOICES[prefs.voice]||VOICES.en;
+const exName=ex=>prefs.voice==="nl"?ex.n:ex.en;
+let voices={};
+function pickVoices(){
+  try{
+    const all=speechSynthesis.getVoices();
+    const best=lang=>{ const c=all.filter(v=>v.lang.replace("_","-").toLowerCase().startsWith(lang)); return c.find(v=>/natural|premium|enhanced|google|samantha|ava|allison|xander|claire/i.test(v.name))||c[0]||null; };
+    voices={en:best("en-us")||best("en"), nl:best("nl")};
+  }catch(e){}
+}
+try{ pickVoices(); speechSynthesis.onvoiceschanged=pickVoices; }catch(e){}
+function say(text, interrupt=true){
+  if(!prefs.sound || prefs.voice==="off") return;
+  try{
+    if(interrupt) speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text), v=V(); u.lang=v.lang;
+    const vc=voices[prefs.voice==="nl"?"nl":"en"]; if(vc) u.voice=vc;
+    u.rate=1.04;
+    u.onstart=()=>duck(true); u.onend=()=>duck(false); u.onerror=()=>duck(false);
+    speechSynthesis.speak(u);
+  }catch(e){}
 }
 const soundIcon=()=>prefs.sound
   ? `<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`
   : `<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 9l5 6M21 9l-5 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`;
+
+/* ---------- muziek: zelf gegenereerd in de browser, rechtenvrij ---------- */
+const mtof=m=>440*Math.pow(2,(m-69)/12);
+const MUSIC={
+  off:{label:"Uit"},
+  energy:{label:"Energiek", bpm:128, prog:[[57,60,64],[53,57,60],[48,52,55],[55,59,62]],
+    kick:[0,4,8,12], clap:[4,12], hat:[2,6,10,14], bass:"eighths", bassWave:"sawtooth", stab:[0,3,6,10], stabWave:"sawtooth"},
+  lofi:{label:"Lo-fi", bpm:84, swing:0.12, prog:[[50,53,57,60],[55,59,62,65],[48,52,55,59],[45,48,52,55]],
+    kick:[0,7,10], snare:[4,12], hat:[0,2,4,6,8,10,12,14], bass:"roots", bassWave:"triangle", pad:true},
+  chip:{label:"8-bit", bpm:140, prog:[[60,64,67],[55,59,62],[57,60,64],[53,57,60]],
+    kick:[0,8], hat:[2,6,10,14], bass:"quarters", bassWave:"square", arp:true}
+};
+let noiseBuf=null, mus={timer:0, next:0, step:0, style:"off"};
+function noise(){ if(noiseBuf) return noiseBuf; const a=ac(); noiseBuf=a.createBuffer(1,a.sampleRate*0.5,a.sampleRate); const d=noiseBuf.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1; return noiseBuf; }
+function env(g,t,peak,att,dec){ g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(peak,t+att); g.gain.exponentialRampToValueAtTime(0.0001,t+att+dec); }
+function tone(f,t,dur,wave,vol,cut){
+  const a=actx, o=a.createOscillator(), g=a.createGain(); o.type=wave; o.frequency.value=f;
+  let node=o; if(cut){ const lp=a.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=cut; o.connect(lp); node=lp; }
+  node.connect(g).connect(musicBus); env(g,t,vol,0.01,dur); o.start(t); o.stop(t+dur+0.05);
+}
+function drum(kind,t){
+  const a=actx;
+  if(kind==="kick"){ const o=a.createOscillator(), g=a.createGain(); o.frequency.setValueAtTime(150,t); o.frequency.exponentialRampToValueAtTime(45,t+0.12); o.connect(g).connect(musicBus); env(g,t,0.9,0.002,0.22); o.start(t); o.stop(t+0.3); return; }
+  const n=a.createBufferSource(); n.buffer=noise(); const f=a.createBiquadFilter(), g=a.createGain();
+  if(kind==="hat"){ f.type="highpass"; f.frequency.value=7000; env(g,t,0.12,0.001,0.05); }
+  else { f.type="bandpass"; f.frequency.value=kind==="clap"?1500:1800; env(g,t,kind==="clap"?0.35:0.3,0.002,0.14); }
+  n.connect(f).connect(g).connect(musicBus); n.start(t); n.stop(t+0.25);
+}
+function scheduleStep(st,step,t){
+  const bar=Math.floor(step/16)%st.prog.length, s=step%16, ch=st.prog[bar], b16=60/st.bpm/4;
+  if(st.kick&&st.kick.includes(s)) drum("kick",t);
+  if(st.snare&&st.snare.includes(s)) drum("snare",t);
+  if(st.clap&&st.clap.includes(s)) drum("clap",t);
+  if(st.hat&&st.hat.includes(s)) drum("hat",t);
+  const root=ch[0]-12;
+  if(st.bass==="eighths" && s%2===0) tone(mtof(s%4===2?root+12:root),t,b16*1.6,st.bassWave,0.16,900);
+  if(st.bass==="roots" && (s===0||s===8)) tone(mtof(root),t,b16*7,st.bassWave,0.3);
+  if(st.bass==="quarters" && s%4===0) tone(mtof(root),t,b16*2.5,st.bassWave,0.07,1800);
+  if(st.stab&&st.stab.includes(s)) ch.forEach(m=>tone(mtof(m+12),t,b16*1.2,st.stabWave,0.035,2400));
+  if(st.pad&&s===0) ch.forEach(m=>tone(mtof(m),t,b16*15,"triangle",0.05,1400));
+  if(st.arp){ const m=ch[s%ch.length]+(Math.floor(s/ch.length)%2?12:0)+12; tone(mtof(m),t,b16*0.8,"square",0.035,4000); }
+}
+function startMusic(style){
+  stopMusic(); if(!MUSIC[style]||style==="off"||!prefs.sound) return;
+  const a=ac(); if(!a) return;
+  const st=MUSIC[style]; mus.style=style; mus.step=0; mus.next=a.currentTime+0.08;
+  musicBus.gain.cancelScheduledValues(a.currentTime); musicBus.gain.setValueAtTime(0.0001,a.currentTime); musicBus.gain.exponentialRampToValueAtTime(musicLevel(),a.currentTime+0.6);
+  mus.timer=setInterval(()=>{
+    const b16=60/st.bpm/4;
+    while(mus.next < actx.currentTime+0.15){
+      const sw = st.swing && mus.step%2 ? b16*st.swing : 0;
+      scheduleStep(st,mus.step,mus.next+sw); mus.next+=b16; mus.step++;
+    }
+  },30);
+}
+function stopMusic(){ if(mus.timer){ clearInterval(mus.timer); mus.timer=0; } mus.style="off"; if(actx&&musicBus){ musicBus.gain.cancelScheduledValues(actx.currentTime); musicBus.gain.setTargetAtTime(0,actx.currentTime,0.08); } }
+let ducked=false, restQuiet=false;
+const musicLevel=()=>(ducked?0.25:1)*(restQuiet?0.55:1)*0.5;
+function setMusicLevel(){ if(actx&&musicBus&&mus.timer) musicBus.gain.setTargetAtTime(musicLevel(),actx.currentTime,0.12); }
+function duck(on){ ducked=on; setMusicLevel(); }
+let previewT=0;
+function previewMusic(style){
+  clearTimeout(previewT);
+  if(style==="off"){ stopMusic(); return; }
+  const was=prefs.sound; if(!was) return toast("Zet eerst het geluid aan in de timer.");
+  startMusic(style); previewT=setTimeout(()=>{ if(!T) stopMusic(); },6000);
+}
+
+/* ---------- XP, levels en badges ---------- */
+const TITLES=["Starter","Doorzetter","Spurter","Krachtpatser","Machine","Atleet","Kampioen","Legende"];
+function xpOf(p){
+  const t=todayKey(); let xp=0, run=0;
+  const start=p.start||t, span=Math.max(0,daysBetween(start,t));
+  for(let i=0;i<=span;i++){ const k=key(addDays(parse(start),i)); if(isDone(p,k)){ run++; xp+=100+10*Math.min(run,10); } else if(k!==t) run=0; }
+  return xp;
+}
+function levelOf(xp){ // level n vanaf 250*(n-1)*n/2 XP
+  let n=1; while(250*n*(n+1)/2<=xp) n++;
+  const lo=250*(n-1)*n/2, hi=250*n*(n+1)/2;
+  return {n, title:TITLES[Math.min(n-1,TITLES.length-1)], lo, hi, pct:(xp-lo)/(hi-lo)};
+}
+function badgesFor(p, sum, firstToday){
+  const s=stats(p), out=[], h=new Date().getHours();
+  const total=Object.values(p.days||{}).filter(Boolean).length;
+  if(total===1) out.push(["Eerste stap","Je allereerste workout"]);
+  for(const n of [3,7,14,30,50,100]) if(s.streak===n) out.push([`${n} op rij`,`${n} dagen achter elkaar`]);
+  if(sum && sum.skipped===0) out.push(["Niets overgeslagen","Alle 12 oefeningen gedaan"]);
+  if(h<8) out.push(["Vroege vogel","Voor 8 uur 's ochtends"]);
+  if(h>=22) out.push(["Nachtbraker","Na 10 uur 's avonds"]);
+  if(firstToday) out.push(["Eerste van de dag","Jij was vandaag de eerste"]);
+  const mon=addDays(new Date(),-((new Date().getDay()+6)%7)); let wk=0; for(let i=0;i<7;i++) if(isDone(p,key(addDays(mon,i)))) wk++;
+  if(wk===7) out.push(["Perfecte week","Maandag t/m zondag gedaan"]);
+  return out;
+}
+const trophySvg=s=>`<svg width="${s}" height="${s}" viewBox="0 0 64 64" aria-hidden="true"><path d="M18 8h28v14a14 14 0 0 1-28 0z" fill="var(--gold)"/><path d="M18 12H9a9 9 0 0 0 9 12M46 12h9a9 9 0 0 1-9 12" fill="none" stroke="var(--gold)" stroke-width="4"/><rect x="28" y="34" width="8" height="10" fill="var(--gold-deep)"/><rect x="19" y="44" width="26" height="8" rx="3" fill="var(--gold-deep)"/><path d="M26 14l2 5 5 .5-4 3.5 1.2 5-4.2-2.7-4.2 2.7L23 22.5 19 19l5-.5z" fill="#fff" opacity=".85"/></svg>`;
+const medalSvg=`<svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2h4l2 6H9zM13 2h4l-2 6h-4z" fill="var(--sky)"/><circle cx="12" cy="15" r="7" fill="var(--gold)"/><circle cx="12" cy="15" r="4.6" fill="none" stroke="#fff" stroke-width="1.5" opacity=".7"/></svg>`;
 
 /* ---------- timer ---------- */
 let T=null, wakeLock=null;
@@ -583,39 +778,53 @@ function openTimer(){
   const list=todaysWorkout();
   const phases=[{type:"prep",i:0,dur:PREP}];
   list.forEach((ex,i)=>{ phases.push({type:"work",i,dur:WORK}); if(i<list.length-1) phases.push({type:"rest",i:i+1,dur:REST}); });
-  T={list,phases,p:0,end:0,left:0,paused:false,lastSec:null,switched:false};
-  try{ actx = actx || new (window.AudioContext||window.webkitAudioContext)(); actx.resume&&actx.resume(); }catch(e){}
+  T={list,phases,p:0,end:0,left:0,paused:false,lastSec:null,switched:false,halved:false,skipped:0,started:Date.now()};
+  ac();
   $("#timer").hidden=false;
   try{ navigator.wakeLock && navigator.wakeLock.request("screen").then(l=>wakeLock=l).catch(()=>{}); }catch(e){}
+  startMusic(prefs.music||"off");
   startPhase(0);
-  T.iv=setInterval(tick,200);
+  T.iv=setInterval(tick,100);
 }
 function closeTimer(){
   if(T) clearInterval(T.iv); T=null; $("#timer").hidden=true; $("#timer").innerHTML="";
   try{ speechSynthesis.cancel(); }catch(e){}
+  stopMusic(); restQuiet=false; ducked=false;
   try{ wakeLock&&wakeLock.release(); }catch(e){} wakeLock=null;
 }
 function startPhase(n){
-  T.p=n; const ph=T.phases[n]; T.end=Date.now()+ph.dur*1000; T.lastSec=null; T.switched=false;
-  const ex=T.list[ph.i];
-  if(ph.type==="work"){ beep(1046,0.35,0.22); say(ex.n); }
-  else if(ph.type==="rest"){ beep(523,0.3); say("Rust. Hierna: "+ex.n); }
-  else say("Maak je klaar. Eerste oefening: "+ex.n);
+  T.p=n; const ph=T.phases[n]; T.end=Date.now()+ph.dur*1000; T.lastSec=null; T.switched=false; T.halved=false;
+  const ex=T.list[ph.i], v=V();
+  restQuiet = ph.type!=="work"; setMusicLevel();
+  if(ph.type==="work"){ beep(1046,0.35,0.22); say(ph.i===T.list.length-1 ? v.last : v.go(exName(ex))); }
+  else if(ph.type==="rest") say(v.rest(exName(ex)));
+  else say(v.ready(exName(ex)));
   drawPhase();
 }
 function finish(){
-  closeTimer(); beep(784,0.15); setTimeout(()=>beep(1046,0.15),160); setTimeout(()=>beep(1318,0.4),320);
+  const sum={skipped:T?T.skipped:0, total:T?T.list.length:12, secs:T?Math.round((Date.now()-T.started)/1000):0, focus:(W.FOCUS[prefs.focus]||W.FOCUS.mix).label};
+  closeTimer();
+  beep(784,0.15); setTimeout(()=>beep(1046,0.15),160); setTimeout(()=>beep(1318,0.45),320);
+  setTimeout(()=>say(V().done),500);
   const p=people.find(x=>x.id===me);
   if(!p){ toast("Goed gedaan! Kies je naam bovenaan om de workout af te vinken."); fireConfetti(); return; }
-  if(isDone(p,todayKey())){ toast("Extra workout gedaan. Sterk!"); fireConfetti(); return; }
-  markToday();
+  if(isDone(p,todayKey())){ celebrate(sum,true); return; }
+  markToday(sum);
 }
-function skipPhase(){ if(!T) return; if(T.paused){ T.paused=false; } if(T.p>=T.phases.length-1) return finish(); startPhase(T.p+1); }
+function skipPhase(){
+  if(!T) return; if(T.paused){ T.paused=false; }
+  const ph=T.phases[T.p]; if(ph.type==="work" && T.end-Date.now()>5000) T.skipped++;
+  if(T.p>=T.phases.length-1) return finish(); startPhase(T.p+1);
+}
 function togglePause(){
   if(!T) return;
-  if(T.paused){ T.end=Date.now()+T.left; T.paused=false; }
-  else { T.left=T.end-Date.now(); T.paused=true; try{ speechSynthesis.cancel(); }catch(e){} }
+  if(T.paused){ T.end=Date.now()+T.left; T.paused=false; if(prefs.music&&prefs.music!=="off") startMusic(prefs.music); }
+  else { T.left=T.end-Date.now(); T.paused=true; try{ speechSynthesis.cancel(); }catch(e){} stopMusic(); }
   const b=$("[data-tpause]"); if(b) b.textContent=T.paused?"Verder":"Pauze";
+}
+function showCount(n){
+  const el=$("#countbig"); if(!el) return;
+  el.textContent=n; el.classList.remove("go"); void el.offsetWidth; el.classList.add("go");
 }
 function tick(){
   if(!T||T.paused) return;
@@ -624,27 +833,37 @@ function tick(){
   const sec=Math.ceil(ms/1000);
   if(sec!==T.lastSec){
     T.lastSec=sec;
-    if(sec<=3) beep(660,0.1);
-    const ex=T.list[ph.i];
-    if(ph.type==="work" && ex.side && !T.switched && sec<=WORK/2){ T.switched=true; beep(880,0.12); setTimeout(()=>beep(880,0.12),180); say("Wissel van kant"); const s=$("#sideslot"); if(s) s.innerHTML=`<div class="switchside">Wissel van kant!</div>`; }
+    const ex=T.list[ph.i], v=V();
+    if(sec<=3){
+      beep(sec===1?880:660,0.12);
+      showCount(sec);
+      // voor elke oefening hardop aftellen; aan het eind van een oefening alleen piepjes
+      if(ph.type!=="work") say(v.count[sec-1], true);
+    }
+    if(ph.type==="work" && ex.side && !T.switched && sec<=WORK/2){ T.switched=true; beep(880,0.12); setTimeout(()=>beep(880,0.12),180); say(v.side); const s=$("#sideslot"); if(s) s.innerHTML=`<div class="switchside">Wissel van kant!</div>`; }
+    if(ph.type==="work" && !ex.side && !T.halved && ph.i===Math.floor(T.list.length/2) && sec<=WORK/2){ T.halved=true; say(v.half); }
   }
   const t=$("#tsec"); if(t) t.textContent=sec;
   const r=$("#tring"); if(r){ const C=2*Math.PI*44; r.setAttribute("stroke-dashoffset",(C*(1-ms/(ph.dur*1000))).toFixed(1)); }
 }
+const musicIcon=`<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l11-2v13" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.8" fill="currentColor"/><circle cx="17.5" cy="16" r="2.8" fill="currentColor"/></svg>`;
 function drawPhase(){
   const ph=T.phases[T.p], ex=T.list[ph.i], C=2*Math.PI*44;
   const label = ph.type==="work" ? `Oefening ${ph.i+1} van ${T.list.length}` : ph.type==="rest" ? "Rust · hierna" : "Klaar maken · eerst";
   const col = ph.type==="work" ? "var(--green)" : "var(--sky)";
   const next = ph.type==="work" && T.list[ph.i+1] ? `<div class="upnext">Hierna: ${esc(T.list[ph.i+1].n)}</div>` : "";
+  const mstyle = MUSIC[prefs.music]||MUSIC.off;
   $("#timer").innerHTML=`<div class="tpanel" role="dialog" aria-modal="true" aria-label="Workout timer">
     <div class="top2">
       <div class="progress">${T.list.map((_,j)=>`<i class="${j<ph.i?"on":(j===ph.i&&ph.type==="work")?"cur":""}"></i>`).join("")}</div>
+      <button class="iconbtn wide" data-tmusic aria-label="Muziek wisselen">${musicIcon}<span>${mstyle.label}</span></button>
       <button class="iconbtn" data-tsound aria-label="${prefs.sound?"Geluid uit":"Geluid aan"}">${soundIcon()}</button>
     </div>
     <span class="phase ${ph.type==="work"?"":"rest"}">${label}</span>
-    <div class="tfig ${ph.type==="work"?"":"rest"}" id="tfig"></div>
+    <div class="tfig ${ph.type==="work"?"":"rest"}" id="tfig"><div class="countbig num" id="countbig" aria-hidden="true"></div></div>
     <div class="tinfo">
       <div class="exname">${esc(ex.n)}</div>
+      ${ex.en!==ex.n?`<div class="exen">${esc(ex.en)}</div>`:""}
       <div class="extip">${esc(ex.tip)}</div>
       <div id="sideslot">${ex.side&&ph.type!=="work"?`<div class="upnext">Halverwege wissel je van kant.</div>`:""}</div>
     </div>
@@ -658,12 +877,19 @@ function drawPhase(){
     </div>
     ${next}
   </div>`;
-  const fig=W.makeFigure(ex); $("#tfig").appendChild(fig); W.animate(fig);
+  const fig=W.makeFigure(ex); $("#tfig").insertBefore(fig,$("#countbig")); W.animate(fig);
+}
+function cycleMusic(){
+  const order=["off","energy","lofi","chip"], i=order.indexOf(prefs.music||"off"), nx=order[(i+1)%order.length];
+  setPref("music",nx); if(T&&!T.paused) startMusic(nx);
+  const b=$("[data-tmusic] span"); if(b) b.textContent=MUSIC[nx].label;
 }
 function fireConfetti(){
   if(typeof confetti!=="function" || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const c=["#4CB81B","#FF8A1F","#F5B700","#1CA8E8","#CE82FF"];
   confetti({particleCount:140,spread:80,origin:{y:.6},colors:c,zIndex:100});
+  setTimeout(()=>confetti({particleCount:60,angle:60,spread:60,origin:{x:0,y:.7},colors:c,zIndex:100}),250);
+  setTimeout(()=>confetti({particleCount:60,angle:120,spread:60,origin:{x:1,y:.7},colors:c,zIndex:100}),400);
 }
 
 
@@ -688,6 +914,9 @@ document.addEventListener("click",e=>{
   else if("tstop" in b.dataset){ closeTimer(); }
   else if("tpause" in b.dataset){ togglePause(); }
   else if("tskip" in b.dataset){ skipPhase(); }
+  else if(b.dataset.voice){ setPref("voice",b.dataset.voice); renderToday(); if(b.dataset.voice!=="off"){ ac(); say(b.dataset.voice==="nl"?"Zo klinkt de Nederlandse stem.":"This is how the English voice sounds."); } }
+  else if(b.dataset.music){ setPref("music",b.dataset.music); renderToday(); ac(); previewMusic(b.dataset.music); }
+  else if("tmusic" in b.dataset){ cycleMusic(); }
   else if("tsound" in b.dataset){ setPref("sound",!prefs.sound); b.innerHTML=soundIcon(); b.setAttribute("aria-label",prefs.sound?"Geluid uit":"Geluid aan"); }
 });
 document.addEventListener("submit",e=>{
@@ -699,12 +928,17 @@ document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ if(!$("#celebrate
 /* ---------- boot ---------- */
 let dbFailed=false;
 render();
-let loading=false;
+let loading=false, seenDone=null;
 async function load(){
   if(loading || busy) return; loading=true;
   try{
     const list=await api("people");
-    if(!busy){ people=list.sort((a,b)=>a.created-b.created); db=true; dbFailed=false; render(); }
+    if(!busy){
+      const t=todayKey(), now=new Set(list.filter(x=>isDone(x,t)).map(x=>x.id));
+      if(seenDone){ for(const x of list) if(now.has(x.id) && !seenDone.has(x.id) && x.id!==me) toast(`${x.name} heeft net de workout gedaan. Jij ook al?`); }
+      seenDone=now;
+      people=list.sort((a,b)=>a.created-b.created); db=true; dbFailed=false; render();
+    }
   }catch(e){ if(e.code!=="auth" && !db){ dbFailed=true; render(); } }
   loading=false;
 }

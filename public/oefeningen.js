@@ -145,6 +145,10 @@ const EX = [
     A:P({a1:[172,176], a2:[168,174]}), B:P({t:162, a1:[75,40], a2:[70,35], l1:[105,-5]}), speed:0.7},
 ];
 
+// Engelse namen voor de stem
+const EN = {"jacks": "Jumping jacks", "highknees": "High knees", "buttkicks": "Butt kicks", "climbers": "Mountain climbers", "burpees": "Burpees", "squatjacks": "Squat jacks", "boxing": "Shadow boxing", "jumpsquats": "Jump squats", "jumplunges": "Jumping lunges", "squats": "Squats", "pulsesquats": "Pulse squats", "sumo": "Sumo squats", "wallsit": "Wall sit", "lunges": "Lunges", "revlunges": "Reverse lunges", "sidelunges": "Side lunges", "stepups": "Step-ups", "calfraises": "Calf raises", "bridge": "Glute bridge", "slbridge": "Single-leg glute bridge", "donkey": "Donkey kicks", "sideleg": "Side-lying leg raises", "goodmorning": "Good mornings", "hipthrust": "Hip thrusts", "bridgepulse": "Glute bridge pulses", "bridgemarch": "Glute bridge march", "kickback": "Standing kickbacks", "standabduct": "Standing leg raises", "lungeknee": "Reverse lunge with knee drive", "pushups": "Push-ups", "kneepush": "Knee push-ups", "diamond": "Diamond push-ups", "dips": "Triceps dips", "rotpush": "Push-up with rotation", "taps": "Plank shoulder taps", "pike": "Pike push-ups", "updown": "Plank up-downs", "inchworm": "Inchworms", "downdog": "Plank to downward dog", "armcircles": "Arm circles", "crabtoe": "Crab toe touches", "crunches": "Crunches", "plank": "Plank", "sideplank": "Side plank", "bicycle": "Bicycle crunches", "deadbug": "Dead bug", "legraises": "Leg raises", "flutter": "Flutter kicks", "hollow": "Hollow hold", "toetouch": "Toe touches", "russian": "Russian twists", "superman": "Superman", "birddog": "Bird dog", "standcrunch": "Standing knee crunch"};
+for(const e of EX) e.en = EN[e.id] || e.n;
+
 /* ---------- poppetje: slanke illustratiestijl ----------
    Elk lichaamsdeel is een gevulde vorm. Ledematen zijn taps toelopende capsules (convex omhulsel van twee cirkels),
    de romp is een vloeiend silhouet met heupen, taille en borst. Alle vormen hebben dezelfde draairichting,
