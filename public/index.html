@@ -648,7 +648,7 @@ function beep(freq=880,dur=0.12,vol=0.18){
 /* ---------- stem: alleen Engels, korte coach-zinnen ----------
    Staan er echte opnames in /voice (zie voice/README.md), dan worden die gebruikt.
    Anders valt de app terug op de beste Engelse stem van het apparaat. */
-const CUES={ready:"Get ready!", go:"Go!", rest:"Rest.", side:"Switch sides!", half:"Halfway there!", last:"Last one. Give it everything!", three:"Three!", two:"Two!", one:"One!", done:"Workout complete. Great job!"};
+const CUES={ready:"Get ready!", rest:"Rest.", side:"Switch sides!", half:"Halfway there!", last:"Last one. Give it everything!", three:"Three!", two:"Two!", one:"One!", done:"Workout complete. Great job!"};
 const clips={}; let clipsLoaded=false;
 async function loadClips(){
   if(clipsLoaded) return; clipsLoaded=true;
@@ -663,27 +663,40 @@ function pickVoice(){
   try{
     const all=speechSynthesis.getVoices().filter(v=>/^en[-_]/i.test(v.lang));
     const pref=[/natural/i,/premium/i,/enhanced/i,/google us english/i,/ava|allison|aria|jenny|samantha|zoe|evan|nathan/i,/en[-_]us/i];
-    enVoice=null; for(const re of pref){ enVoice=all.find(v=>re.test(v.name)||re.test(v.lang)); if(enVoice) break; }
-    if(!enVoice) enVoice=all[0]||null;
+    let best=null; for(const re of pref){ best=all.find(v=>re.test(v.name)||re.test(v.lang)); if(best) break; }
+    enVoice=best||all[0]||enVoice;
+  }catch(e){}
+  return enVoice;
+}
+try{ pickVoice(); speechSynthesis.addEventListener ? speechSynthesis.addEventListener("voiceschanged",pickVoice) : (speechSynthesis.onvoiceschanged=pickVoice); }catch(e){}
+// Stem "opwarmen" bij de start van de timer, zodat het eerste woord ook al Engels is
+function warmVoice(){
+  pickVoice();
+  try{ const u=new SpeechSynthesisUtterance(" "); u.lang="en-US"; if(enVoice) u.voice=enVoice; u.volume=0; speechSynthesis.speak(u); }catch(e){}
+  if(!enVoice){ let n=0; const iv=setInterval(()=>{ if(pickVoice()||++n>20) clearInterval(iv); },150); }
+}
+function speak(text, interrupt=true){
+  if(!prefs.sound) return;
+  try{
+    if(!enVoice) pickVoice();
+    if(interrupt) speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text); u.lang="en-US";
+    if(enVoice){ u.voice=enVoice; u.lang=enVoice.lang; }
+    u.rate=1.12; u.pitch=1.08; u.volume=1;
+    u.onstart=()=>duck(true); u.onend=()=>duck(false); u.onerror=()=>duck(false);
+    speechSynthesis.speak(u);
   }catch(e){}
 }
-try{ pickVoice(); speechSynthesis.onvoiceschanged=pickVoice; }catch(e){}
 let clipSrc=null;
 function cue(key){
   if(!prefs.sound) return;
   const a=ac();
   if(clips[key] && a){
     try{ if(clipSrc) clipSrc.stop(); }catch(e){}
-    const s=a.createBufferSource(), g=a.createGain(); g.gain.value=1; s.buffer=clips[key]; s.connect(g).connect(a.destination);
+    const s=a.createBufferSource(); s.buffer=clips[key]; s.connect(a.destination);
     duck(true); s.onended=()=>duck(false); s.start(); clipSrc=s; return;
   }
-  try{
-    speechSynthesis.cancel();
-    const u=new SpeechSynthesisUtterance(CUES[key]); u.lang="en-US"; if(enVoice) u.voice=enVoice;
-    u.rate=1.12; u.pitch=1.08; u.volume=1;
-    u.onstart=()=>duck(true); u.onend=()=>duck(false); u.onerror=()=>duck(false);
-    speechSynthesis.speak(u);
-  }catch(e){}
+  speak(CUES[key]);
 }
 // startdeuntje: vrolijk oplopend akkoordje
 function startJingle(){
@@ -699,25 +712,39 @@ const mtof=m=>440*Math.pow(2,(m-69)/12);
 const MUSIC={
   off:{label:"Uit"},
   energy:{label:"Energiek", bpm:138, custom:energyStep},
-  chip:{label:"8-bit", bpm:140, prog:[[60,64,67],[55,59,62],[57,60,64],[53,57,60]],
-    kick:[0,8], hat:[2,6,10,14], bass:"quarters", bassWave:"square", arp:true}
+  house:{label:"House", bpm:126, custom:houseStep},
+  power:{label:"Hard", bpm:150, custom:powerStep, gain:0.45},
+  chip:{label:"8-bit", bpm:144, custom:chipStep, gain:1.5}
 };
 let noiseBuf=null, mus={timer:0, next:0, step:0, style:"off"};
 function noise(){ if(noiseBuf) return noiseBuf; const a=ac(); noiseBuf=a.createBuffer(1,a.sampleRate*0.5,a.sampleRate); const d=noiseBuf.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1; return noiseBuf; }
 function env(g,t,peak,att,dec){ g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(peak,t+att); g.gain.exponentialRampToValueAtTime(0.0001,t+att+dec); }
-function tone(f,t,dur,wave,vol,cut){
-  const a=actx, o=a.createOscillator(), g=a.createGain(); o.type=wave; o.frequency.value=f;
-  let node=o; if(cut){ const lp=a.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=cut; o.connect(lp); node=lp; }
-  node.connect(g).connect(musicBus); env(g,t,vol,0.01,dur); o.start(t); o.stop(t+dur+0.05);
+let distBus=null;
+function dist(){
+  if(distBus) return distBus;
+  const a=actx, w=a.createWaveShaper(), n=2048, c=new Float32Array(n), k=40;
+  for(let i=0;i<n;i++){ const x=i*2/n-1; c[i]=(1+k)*x/(1+k*Math.abs(x)); }
+  w.curve=c; const g=a.createGain(); g.gain.value=0.5; w.connect(g).connect(musicBus); distBus=w; return w;
 }
-function drum(kind,t){
+function tone(f,t,dur,wave,vol,cut,opt={}){
+  const a=actx, o=a.createOscillator(), g=a.createGain(); o.type=wave; o.frequency.setValueAtTime(f,t);
+  if(opt.detune) o.detune.value=opt.detune;
+  if(opt.slide) o.frequency.exponentialRampToValueAtTime(f*opt.slide,t+dur);
+  let node=o; if(cut){ const lp=a.createBiquadFilter(); lp.type="lowpass"; lp.frequency.setValueAtTime(cut,t); if(opt.sweep) lp.frequency.exponentialRampToValueAtTime(opt.sweep,t+dur); if(opt.q) lp.Q.value=opt.q; o.connect(lp); node=lp; }
+  node.connect(g).connect(opt.dist?dist():musicBus); env(g,t,vol,opt.att||0.01,dur); o.start(t); o.stop(t+dur+0.05);
+}
+function drum(kind,t,vol=1,opt={}){
   const a=actx;
-  if(kind==="kick"){ const o=a.createOscillator(), g=a.createGain(); o.frequency.setValueAtTime(150,t); o.frequency.exponentialRampToValueAtTime(45,t+0.12); o.connect(g).connect(musicBus); env(g,t,0.9,0.002,0.22); o.start(t); o.stop(t+0.3); return; }
+  if(kind==="kick"){ const o=a.createOscillator(), g=a.createGain(); o.frequency.setValueAtTime(opt.hard?190:150,t); o.frequency.exponentialRampToValueAtTime(opt.hard?42:45,t+(opt.hard?0.16:0.12)); o.connect(g).connect(opt.hard?dist():musicBus); env(g,t,0.9*vol,0.002,opt.hard?0.32:0.22); o.start(t); o.stop(t+0.4); return; }
   const n=a.createBufferSource(); n.buffer=noise(); const f=a.createBiquadFilter(), g=a.createGain();
-  if(kind==="hat"){ f.type="highpass"; f.frequency.value=7000; env(g,t,0.12,0.001,0.05); }
-  else { f.type="bandpass"; f.frequency.value=kind==="clap"?1500:1800; env(g,t,kind==="clap"?0.35:0.3,0.002,0.14); }
-  n.connect(f).connect(g).connect(musicBus); n.start(t); n.stop(t+0.25);
+  if(kind==="hat"){ f.type="highpass"; f.frequency.value=7000; env(g,t,0.12*vol,0.001,0.05); }
+  else if(kind==="ohat"){ f.type="highpass"; f.frequency.value=6500; env(g,t,0.1*vol,0.002,0.22); }
+  else if(kind==="shaker"){ f.type="bandpass"; f.frequency.value=9000; env(g,t,0.05*vol,0.004,0.04); }
+  else { f.type="bandpass"; f.frequency.value=kind==="clap"?1500:1800; env(g,t,(kind==="clap"?0.35:0.3)*vol,0.002,0.14); }
+  n.connect(f).connect(g).connect(opt.hard?dist():musicBus); n.start(t); n.stop(t+0.4);
 }
+// opbouw van een nummer: 4 delen van 8 maten, elke ronde een andere toonsoort
+function arr(step,keys){ const bar=Math.floor(step/16); return {bar, s:step%16, sec:Math.floor(bar/8)%4, bIn:bar%8, tr:keys[Math.floor(bar/32)%keys.length]}; }
 /* Energiek: een nummer van 32 maten dat steeds verandert:
    groove -> melodie -> opbouw met roffel en ruis -> drop. Elke ronde in een andere toonsoort. */
 const E_PROG=[[[57,60,64],[53,57,60],[48,52,55],[55,59,62]], [[53,57,60],[55,59,62],[52,55,59],[57,60,64]]];
@@ -770,6 +797,62 @@ function crash(t){
   n.buffer=noise(); n.loop=true; f.type="highpass"; f.frequency.value=4000; env(g,t,0.22,0.005,1.6);
   n.connect(f).connect(g).connect(musicBus); n.start(t); n.stop(t+1.7);
 }
+/* House 126: four-on-the-floor, open hats op de offbeat, pianoakkoorden, groovende bas.
+   Delen: groove -> piano erbij -> break zonder kick -> alles. */
+const H_PROG=[[53,57,60,64],[55,59,62,65],[52,55,59,62],[57,60,64,67]];
+const H_PIANO=[0,3,6,10,13], H_BASS=[[0,0],[3,7],[6,12],[8,0],[11,7],[14,10]];
+function houseStep(st,step,t){
+  const {bar,s,sec,bIn,tr}=arr(step,[0,2,-3,5]), b16=60/st.bpm/4, ch=H_PROG[bar%4].map(m=>m+tr), root=ch[0]-24;
+  const brk=sec===2;
+  if(!brk || bIn>=6){ if(s%4===0) drum("kick",t); }
+  if(!brk && (s===4||s===12)) drum("clap",t,0.8);
+  if(s%4===2) drum("ohat",t,brk?0.5:1);
+  if(sec>=1) drum("shaker",t,s%2?0.6:1);
+  if(bIn%4===3 && s>=13 && !brk) drum("snare",t,0.6);
+  if(!brk) for(const [st2,iv] of H_BASS) if(s===st2) tone(mtof(root+iv),t,b16*1.5,"sawtooth",0.16,600,{q:6});
+  if(brk && s===0) tone(mtof(root),t,b16*14,"sine",0.25);
+  if(sec>=1 && H_PIANO.includes(s)) ch.forEach((m,k)=>{ tone(mtof(m+12),t,b16*(brk?6:2.2),"triangle",0.05,3000); tone(mtof(m+24),t,b16*1.2,"sine",0.018); });
+  if(brk && s===0) ch.forEach(m=>tone(mtof(m),t,b16*15,"sawtooth",0.02,900+bIn*200,{att:0.3}));
+  if(sec===3 && [0,6,8,14].includes(s)) tone(mtof(ch[(s/2)%4]+24),t,b16*1.8,"square",0.03,2500,{detune:8});
+  if(sec===3 && bIn===0 && s===0) crash(t);
+}
+/* Hard 150: vervormde kick, rollende offbeat-bas, krijsende lead in de drop. */
+const P_PROG=[[57,60,64],[57,60,64],[53,57,60],[55,59,62]];
+const P_LEAD=[0,null,0,1,null,0,2,null,0,null,0,1,null,3,2,null];
+function powerStep(st,step,t){
+  const {bar,s,sec,bIn,tr}=arr(step,[0,-2,3,1]), b16=60/st.bpm/4, ch=P_PROG[bar%4].map(m=>m+tr), root=ch[0]-24;
+  if(sec!==2){ if(s%4===0) drum("kick",t,1,{hard:true}); }
+  else { if(bIn<6 && s%4===0) drum("kick",t,0.9,{hard:true}); const ev=bIn<2?8:bIn<4?4:bIn<6?2:1; if(s%ev===0){ drum("snare",t,0.9); if(bIn>=4) drum("clap",t,0.7); } if(bIn===0&&s===0) riser(t,b16*16*8); }
+  if(sec!==2 && (s===4||s===12)) { drum("clap",t,1); drum("snare",t,0.6); }
+  if(sec>=1 && sec!==2) drum("hat",t,s%4===2?1.2:0.6);
+  if(sec===0 && s%4===2) drum("ohat",t);
+  if(sec!==2 && s%4!==0) tone(mtof(root+(s%4===2?12:0)),t,b16*0.85,"sawtooth",0.22,1400,{dist:true,sweep:300});
+  if(sec===2 && s%2===0) tone(mtof(root),t,b16*1.6,"sawtooth",0.1+bIn*0.02,400+bIn*250,{dist:true});
+  if(sec===3){ const n=P_LEAD[s]; if(n!=null){ const m=[ch[0],ch[1],ch[2],ch[0]+12][n]+12; tone(mtof(m),t,b16*1.5,"sawtooth",0.06,5000,{detune:-12}); tone(mtof(m),t,b16*1.5,"sawtooth",0.06,5000,{detune:12}); } if(bIn===0&&s===0) crash(t); }
+  if(sec===1 && s===0) ch.forEach(m=>tone(mtof(m+12),t,b16*14,"sawtooth",0.025,1600,{detune:10,att:0.2}));
+}
+/* 8-bit 144: arpeggio, melodie, brug met andere akkoorden en een refrein met tweede stem. */
+const C_PROG=[[[60,64,67],[55,59,62],[57,60,64],[53,57,60]],[[53,57,60],[55,59,62],[52,55,59],[57,60,64]]];
+const C_MEL=[[0,null,2,null,4,null,2,3,4,null,null,2,null,1,0,null],[4,null,3,2,null,0,null,2,1,null,0,null,1,2,null,null],[0,2,4,null,5,null,4,2,null,3,null,2,1,null,0,null]];
+function chipStep(st,step,t){
+  const {bar,s,sec,bIn,tr}=arr(step,[0,2,5,-1]), b16=60/st.bpm/4, prog=C_PROG[sec===2?1:0], ch=prog[bar%4].map(m=>m+tr), root=ch[0]-12;
+  const scale=[ch[0],ch[1],ch[2],ch[0]+12,ch[1]+12,ch[2]+12];
+  // drums met ruis, fills elke 4 maten
+  if(s%8===0 || (sec===3 && s%4===0)) drum("kick",t,0.8);
+  if(sec>=1 && (s===4||s===12)) drum("snare",t,0.7);
+  if(s%2===0 && sec!==2) drum("hat",t,0.8);
+  if(bIn%4===3 && s>=12) drum("snare",t,0.6);
+  // bas: pulserend
+  if(s%2===0) tone(mtof(root+(s%8===4?7:0)),t,b16*1.2,"triangle",0.22);
+  // arpeggio
+  const arpVol = sec===1?0.018:0.03, arpLen=sec===3?1:2;
+  if(s%arpLen===0) tone(mtof(scale[(s/arpLen)%(sec===3?6:3)]+12),t,b16*0.7,"square",arpVol,4000);
+  // melodie (deel 2 en 4), in deel 4 met een tweede stem een octaaf hoger
+  if(sec===1||sec===3){ const n=C_MEL[bar%3][s]; if(n!=null){ tone(mtof(scale[n]+12),t,b16*1.8,"square",0.045,5000); if(sec===3) tone(mtof(scale[n]+24),t,b16*1.4,"square",0.02,6000); } }
+  // brug: trillende tonen
+  if(sec===2 && s%4===0) tone(mtof(scale[(bar+s/4)%6]+12),t,b16*3.5,"square",0.03,3000,{slide:1.06});
+  if(sec===3 && bIn===0 && s===0) tone(mtof(scale[3]+24),t,b16*8,"square",0.03,6000,{slide:0.5});
+}
 function scheduleStep(st,step,t){
   if(st.custom) return st.custom(st,step,t);
   const bar=Math.floor(step/16)%st.prog.length, s=step%16, ch=st.prog[bar], b16=60/st.bpm/4;
@@ -800,7 +883,7 @@ function startMusic(style){
 }
 function stopMusic(){ if(mus.timer){ clearInterval(mus.timer); mus.timer=0; } mus.style="off"; if(actx&&musicBus){ musicBus.gain.cancelScheduledValues(actx.currentTime); musicBus.gain.setTargetAtTime(0,actx.currentTime,0.08); } }
 let ducked=false, restQuiet=false;
-const musicLevel=()=>(ducked?0.25:1)*(restQuiet?0.55:1)*0.5;
+const musicLevel=()=>(ducked?0.25:1)*(restQuiet?0.55:1)*0.5*((MUSIC[mus.style]||{}).gain||1);
 function setMusicLevel(){ if(actx&&musicBus&&mus.timer) musicBus.gain.setTargetAtTime(musicLevel(),actx.currentTime,0.12); }
 function duck(on){ ducked=on; setMusicLevel(); }
 let previewT=0;
@@ -847,7 +930,7 @@ function openTimer(){
   const phases=[{type:"prep",i:0,dur:PREP}];
   list.forEach((ex,i)=>{ phases.push({type:"work",i,dur:WORK}); if(i<list.length-1) phases.push({type:"rest",i:i+1,dur:REST}); });
   T={list,phases,p:0,end:0,left:0,paused:false,lastSec:null,switched:false,halved:false,skipped:0,started:Date.now()};
-  ac(); loadClips();
+  ac(); loadClips(); warmVoice();
   $("#timer").hidden=false;
   try{ navigator.wakeLock && navigator.wakeLock.request("screen").then(l=>wakeLock=l).catch(()=>{}); }catch(e){}
   startMusic(prefs.music||"off");
@@ -862,8 +945,9 @@ function closeTimer(){
 }
 function startPhase(n){
   T.p=n; const ph=T.phases[n]; T.end=Date.now()+ph.dur*1000; T.lastSec=null; T.switched=false; T.halved=false;
+  const ex=T.list[ph.i];
   restQuiet = ph.type!=="work"; setMusicLevel();
-  if(ph.type==="work"){ const k=ph.i===T.list.length-1?"last":"go"; startJingle(); setTimeout(()=>{ if(T) cue(k); },120); }
+  if(ph.type==="work"){ const last=ph.i===T.list.length-1, name=ex.en; startJingle(); setTimeout(()=>{ if(T) speak(last?`Last one! ${name}`:name); },380); }
   else if(ph.type==="rest") cue("rest");
   else cue("ready");
   drawPhase();
@@ -943,7 +1027,7 @@ function drawPhase(){
   const fig=W.makeFigure(ex); $("#tfig").insertBefore(fig,$("#countbig")); W.animate(fig);
 }
 function cycleMusic(){
-  const order=["off","energy","chip"], i=order.indexOf(prefs.music||"off"), nx=order[(i+1)%order.length];
+  const order=["off","energy","house","power","chip"], i=order.indexOf(prefs.music||"off"), nx=order[(i+1)%order.length];
   setPref("music",nx); if(T&&!T.paused) startMusic(nx);
   const b=$("[data-tmusic] span"); if(b) b.textContent=MUSIC[nx].label;
 }

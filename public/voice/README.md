@@ -7,7 +7,6 @@ Engelse stem van het apparaat.
 | sleutel | zin                              |
 |---------|----------------------------------|
 | ready   | Get ready!                       |
-| go      | Go!                              |
 | rest    | Rest.                            |
 | side    | Switch sides!                    |
 | half    | Halfway there!                   |
@@ -20,7 +19,7 @@ Engelse stem van het apparaat.
 Voorbeeld `clips.json`:
 
 ```json
-{ "ready": "ready.mp3", "go": "go.mp3", "rest": "rest.mp3", "side": "side.mp3", "half": "half.mp3",
+{ "ready": "ready.mp3", "rest": "rest.mp3", "side": "side.mp3", "half": "half.mp3",
   "last": "last.mp3", "three": "three.mp3", "two": "two.mp3", "one": "one.mp3", "done": "done.mp3" }
 ```
 
