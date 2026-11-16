@@ -1,0 +1,10 @@
+{
+  "name": "zeven-minuten-club",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Dagelijkse 7-minute workout tracker met streaks voor een kleine groep.",
+  "dependencies": {
+    "@netlify/blobs": "^10.7.13"
+  }
+}

@@ -1,29 +1,6 @@
-functionsDirectory = "/Users/renshiemstra/Downloads/zmc-netlify/netlify/functions"
-functionsDirectoryOrigin = "config-v1"
-plugins = []
-headers = []
-redirects = []
-
 [build]
-publish = "/Users/renshiemstra/Downloads/zmc-netlify/public"
-publishOrigin = "config"
-functions = "/Users/renshiemstra/Downloads/zmc-netlify/netlify/functions"
-
-  [build.environment]
-
-  [build.processing]
-
-    [build.processing.css]
-
-    [build.processing.html]
-
-    [build.processing.images]
-
-    [build.processing.js]
-
-  [build.services]
+  publish = "public"
+  functions = "netlify/functions"
 
 [functions]
-
-  [functions."*"]
   node_bundler = "esbuild"

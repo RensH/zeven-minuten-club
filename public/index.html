@@ -15,6 +15,8 @@
   --green:#4CB81B; --green-deep:#3A9212; --green-soft:#E3F6D6;
   --flame:#FF8A1F; --flame-soft:#FFEBD6; --gold:#F5B700; --gold-deep:#C99300; --gold-soft:#FFF4CC;
   --sky:#1CA8E8; --sky-deep:#1287BE; --miss:#E9EEE4; --danger:#E5484D;
+  --plum:#A560E8; --plum-soft:#F3E8FD; --wood:#C9A27A;
+  --skin:#EDC3A5; --skin-far:#D9A887; --outfit:#1D211C; --outfit-far:#4A5147; --shoe:#1D211C; --hair:#1E1916; --tie:#E3E1DA;
   --display:"Baloo 2","Nunito",ui-rounded,system-ui,sans-serif;
   --body:"Nunito",ui-rounded,system-ui,-apple-system,"Segoe UI",sans-serif;
 }
@@ -22,12 +24,12 @@
   --bg:#121812; --surface:#1B231A; --line:#2B3628; --fg:#EAF2E4; --muted:#9AAA92;
   --green:#5BCB27; --green-deep:#3E9A15; --green-soft:#1F3517;
   --flame:#FF9A3C; --flame-soft:#3A2614; --gold:#FFC93A; --gold-deep:#B88A00; --gold-soft:#3A3010;
-  --sky:#3DB8F0; --sky-deep:#1C86B5; --miss:#283126; --danger:#FF6B6F; color-scheme:dark}}
+  --sky:#3DB8F0; --sky-deep:#1C86B5; --miss:#283126; --danger:#FF6B6F; --plum:#C08BFF; --plum-soft:#2E2140; --wood:#8A6A4A; --outfit:#E4EBDF; --outfit-far:#A9B4A3; --shoe:#E4EBDF; --hair:#A07A5E; --skin-far:#C99A7B; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#121812; --surface:#1B231A; --line:#2B3628; --fg:#EAF2E4; --muted:#9AAA92;
   --green:#5BCB27; --green-deep:#3E9A15; --green-soft:#1F3517;
   --flame:#FF9A3C; --flame-soft:#3A2614; --gold:#FFC93A; --gold-deep:#B88A00; --gold-soft:#3A3010;
-  --sky:#3DB8F0; --sky-deep:#1C86B5; --miss:#283126; --danger:#FF6B6F; color-scheme:dark}
+  --sky:#3DB8F0; --sky-deep:#1C86B5; --miss:#283126; --danger:#FF6B6F; --plum:#C08BFF; --plum-soft:#2E2140; --wood:#8A6A4A; --outfit:#E4EBDF; --outfit-far:#A9B4A3; --shoe:#E4EBDF; --hair:#A07A5E; --skin-far:#C99A7B; color-scheme:dark}
 
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.45;
@@ -166,6 +168,73 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--sky);outline-of
 .progress i.cur{background:var(--flame)}
 .toast{position:fixed;left:50%;bottom:max(20px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;background:var(--fg);color:var(--bg);
   padding:12px 18px;border-radius:14px;font-weight:700;font-size:14px;max-width:calc(100% - 32px)}
+
+/* poppetje */
+.fig{display:block;width:100%;height:auto;overflow:visible}
+.fig .part{stroke:none}
+.fig .skin{fill:var(--skin)} .fig .skin.far{fill:var(--skin-far)}
+.fig .outfit{fill:var(--outfit)} .fig .outfit.far{fill:var(--outfit-far)}
+.fig .shoe{fill:var(--shoe)} .fig .shoe.far{fill:var(--outfit-far)}
+.fig .hair{fill:var(--hair)} .fig .tie{fill:var(--tie)} .fig .ear{fill:var(--skin-far)}
+.fig.front .skin.far{fill:var(--skin)} .fig.front .outfit.far{fill:color-mix(in srgb,var(--outfit) 86%,var(--outfit-far))} .fig.front .shoe.far{fill:var(--shoe)}
+.fig .ground{stroke:var(--line);stroke-width:1}
+.fig .shadow{fill:color-mix(in srgb,var(--fg) 8%,transparent)}
+.fig .prop rect{fill:var(--wood)}
+
+/* workout van vandaag */
+.today{display:flex;flex-direction:column;gap:14px}
+.today .sect-h{margin:0}
+.focus{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 6px;margin:0 -2px;scrollbar-width:none}
+.focus::-webkit-scrollbar{display:none}
+.fchip{flex:none;border:2px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 14px;font-weight:800;font-size:14px;box-shadow:0 3px 0 var(--line);white-space:nowrap}
+.fchip[aria-pressed="true"]{border-color:var(--green);background:var(--green-soft);color:var(--green-deep);box-shadow:0 3px 0 var(--green-deep)}
+:root[data-theme="dark"] .fchip[aria-pressed="true"]{color:var(--green)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .fchip[aria-pressed="true"]{color:var(--green)}}
+.opts{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.switch{display:flex;align-items:center;gap:10px;font-weight:800;font-size:14px;cursor:pointer;background:none;border:0;padding:4px 0}
+.switch .track{width:42px;height:26px;border-radius:999px;background:var(--miss);position:relative;flex:none;transition:background .15s}
+.switch .track::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:var(--surface);box-shadow:0 1px 2px #0003;transition:transform .15s}
+.switch[aria-checked="true"] .track{background:var(--green)}
+.switch[aria-checked="true"] .track::after{transform:translateX(16px)}
+.exgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;list-style:none;margin:0;padding:0}
+@media (max-width:520px){.exgrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.exc{display:flex;flex-direction:column;align-items:stretch;gap:2px;width:100%;border:2px solid var(--line);border-radius:16px;background:var(--surface);padding:6px 6px 8px;text-align:left;position:relative;min-width:0}
+.exc:hover{border-color:color-mix(in srgb,var(--sky) 50%,var(--line))}
+.exc .no{position:absolute;top:6px;left:8px;font-family:var(--display);font-weight:800;font-size:13px;color:var(--muted)}
+.exc .nm{font-weight:800;font-size:12.5px;overflow-wrap:anywhere;hyphens:auto;line-height:1.2;min-height:2.4em;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.cat{display:inline-block;width:8px;height:8px;border-radius:50%;flex:none}
+.cat-c{background:var(--flame)} .cat-l{background:var(--plum)} .cat-u{background:var(--sky)} .cat-k{background:var(--gold)}
+.exc .cat{position:absolute;top:10px;right:10px}
+.catlegend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;font-weight:700;color:var(--muted)}
+.catlegend span{display:flex;align-items:center;gap:6px}
+.todaybtns{display:flex;gap:10px;flex-wrap:wrap}
+.todaybtns .btn{flex:1 1 180px}
+.needs{font-size:13px;font-weight:700;color:var(--muted);margin:0}
+
+/* oefening-uitleg */
+.detail .fig{max-width:300px}
+.detail .meta{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.pill{font-size:12px;font-weight:800;padding:4px 10px;border-radius:999px;background:var(--miss);color:var(--muted);display:inline-flex;align-items:center;gap:6px}
+.easy{font-size:14px;font-weight:600;color:var(--muted);background:var(--bg);border-radius:14px;padding:10px 12px;text-align:left;width:100%}
+.easy b{color:var(--fg)}
+
+/* timer */
+#timer{place-items:stretch;overflow-y:auto}
+@media (max-height:720px){.tfig{max-width:230px}.tpanel{gap:8px;padding:14px}.exname{font-size:24px}}
+.tpanel{background:var(--surface);border:2px solid var(--line);border-radius:26px;padding:18px 18px 20px;max-width:460px;width:100%;margin:auto;display:flex;flex-direction:column;gap:12px;align-items:center;text-align:center}
+.tpanel .top2{display:flex;align-items:center;gap:10px;width:100%}
+.tpanel .progress{flex:1}
+.iconbtn{width:40px;height:40px;flex:none;border-radius:12px;border:2px solid var(--line);background:var(--surface);display:grid;place-items:center;padding:0;color:var(--muted)}
+.tfig{width:100%;max-width:340px;border-radius:20px;background:var(--bg);padding:6px 8px 0}
+.tfig.rest{background:color-mix(in srgb,var(--sky) 10%,var(--bg))}
+.tinfo{display:flex;flex-direction:column;gap:6px;align-items:center}
+.switchside{font-family:var(--display);font-weight:800;font-size:18px;color:var(--flame);animation:pop .4s cubic-bezier(.3,1.6,.5,1) both}
+.tbottom{display:flex;align-items:center;justify-content:center;gap:16px;width:100%}
+.ring{position:relative;width:112px;height:112px;flex:none}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring .t{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:40px}
+.tctrl{display:flex;flex-direction:column;gap:8px}
+.upnext{font-size:13px;font-weight:700;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 html,body{margin:0}
@@ -202,10 +271,13 @@ img{max-width:100%}
       <span><i style="border:1.5px solid var(--line)"></i>Nog te komen</span>
     </div>
   </section>
+
+  <section class="card today" id="today" aria-labelledby="todayh"></section>
 </div>
 
 <div class="overlay" id="celebrate" hidden></div>
 <div class="overlay" id="timer" hidden></div>
+<div class="overlay" id="detail" hidden></div>
 <div class="overlay" id="gate" hidden>
   <form class="panel gate" id="gateform">
     <div class="logo" aria-hidden="true">7</div>
@@ -219,27 +291,14 @@ img{max-width:100%}
 <div class="toast" id="toast" hidden></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.9.3/confetti.browser.min.js"></script>
+<script src="oefeningen.js"></script>
 <script>
 (function(){
 const $ = s => document.querySelector(s);
 const COLORS = ["#1CA8E8","#CE82FF","#FF4B4B","#FF9600","#2B70C9","#00A88E","#E35A9E","#8A6CFF"];
 const DAYS = ["zo","ma","di","wo","do","vr","za"];
 const MONTHS = ["januari","februari","maart","april","mei","juni","juli","augustus","september","oktober","november","december"];
-const EXERCISES = [
-  ["Jumping jacks","Spring met armen en benen wijd en weer terug."],
-  ["Wall sit","Rug tegen de muur, knieën in 90 graden. Volhouden."],
-  ["Push-ups","Lichaam in één rechte lijn, borst richting de grond."],
-  ["Crunches","Schouders van de grond, onderrug blijft liggen."],
-  ["Step-ups op een stoel","Om en om met links en rechts omhoog stappen."],
-  ["Squats","Billen naar achteren, knieën boven je tenen."],
-  ["Triceps dips op een stoel","Handen op de stoelrand, ellebogen naar achteren buigen."],
-  ["Plank","Op je onderarmen, buik aanspannen, heupen niet laten zakken."],
-  ["Hoge knieën","Ter plekke rennen, knieën tot heuphoogte."],
-  ["Lunges","Grote stap naar voren, achterste knie richting vloer. Wissel af."],
-  ["Push-up met rotatie","Na elke push-up draai je open naar een zijplank."],
-  ["Zijplank","15 seconden links, 15 seconden rechts."]
-];
-const WORK=30, REST=10;
+const WORK=30, REST=10, PREP=10;
 
 /* ---------- dates ---------- */
 const pad = n => String(n).padStart(2,"0");
@@ -294,7 +353,7 @@ function render(){
   const now=new Date();
   $("#dateline").textContent = ["Zondag","Maandag","Dinsdag","Woensdag","Donderdag","Vrijdag","Zaterdag"][now.getDay()]+" "+now.getDate()+" "+MONTHS[now.getMonth()]+" · 12 oefeningen in 7 minuten";
   if(me && !people.find(p=>p.id===me) && people.length) me=null;
-  renderChips(); renderHero(); renderBoard();
+  renderChips(); renderHero(); renderToday(); renderBoard();
 }
 
 function renderChips(){
@@ -338,7 +397,7 @@ function renderHero(){
     ? `<div class="done-banner">${checkSvg(22).replace('#fff','currentColor')} Workout van vandaag gedaan!</div>
        <div class="row2"><button class="linkish" data-undo>Toch niet gedaan? Ongedaan maken</button></div>`
     : `<button class="btn bigbtn" data-mark>Ik heb mijn workout gedaan</button>
-       <div class="row2"><button class="btn sky small" data-start>Start workout met timer</button></div>`;
+       <div class="row2"><button class="btn sky small" data-start>Start de workout van vandaag</button></div>`;
   hero.innerHTML = `
     <div><div class="greet">Hoi ${esc(p.name)}!</div>
     <h2>${s.doneToday ? (s.streak>1?`${s.streak} dagen op rij. Top!`:"Goed begin!") : (s.streak? `Houd je streak van ${s.streak} vast` : "Tijd voor 7 minuten")}</h2></div>
@@ -437,43 +496,176 @@ async function join(name){
   }catch(e){ if(e.message){ joinErr=e.message; renderChips(); } else failWrite(e); }
 }
 
-/* ---------- workout timer ---------- */
-let tState=null, wakeLock=null;
+/* ---------- workout van vandaag ---------- */
+const W = window.ZMC_EX;
+const prefs = {focus:"mix", nojump:false, sound:true};
+try{ Object.assign(prefs, JSON.parse(localStorage.getItem("zmc-prefs")||"{}")); }catch(e){}
+function setPref(k,v){ prefs[k]=v; try{ localStorage.setItem("zmc-prefs",JSON.stringify(prefs)); }catch(e){} }
+let variant=0;
+const CATN = W.CAT;
+function todaysWorkout(){
+  const t=todayKey(), y=key(addDays(parse(t),-1));
+  return W.workoutFor(t, y, W.FOCUS[prefs.focus]?prefs.focus:"mix", prefs.nojump, variant);
+}
+function needsText(list){
+  const n=new Set(list.map(e=>e.prop).filter(Boolean));
+  const parts=[]; if(n.has("stepbox")||n.has("bench")||n.has("backbench")) parts.push("een stevige stoel of bank"); if(n.has("wall")) parts.push("een muur");
+  return parts.length ? "Nodig: "+parts.join(" en ")+"." : "Geen spullen nodig.";
+}
+function renderToday(){
+  const el=$("#today"); const list=todaysWorkout();
+  const fchips=Object.entries(W.FOCUS).map(([k,f])=>`<button class="fchip" data-focus="${k}" aria-pressed="${prefs.focus===k}">${f.label}</button>`).join("");
+  el.innerHTML=`
+    <div class="sect-h"><h2 id="todayh">Workout van vandaag</h2><span>12 × 30 sec</span></div>
+    <div class="focus" role="group" aria-label="Focus">${fchips}</div>
+    <div class="opts">
+      <button class="switch" data-nojump role="switch" aria-checked="${!!prefs.nojump}"><span class="track"></span>Zonder springen</button>
+      <span class="catlegend">${Object.entries(CATN).map(([k,v])=>`<span><i class="cat cat-${k}"></i>${v}</span>`).join("")}</span>
+    </div>
+    <ol class="exgrid" id="exgrid"></ol>
+    <p class="needs">${needsText(list)} Tik op een oefening voor uitleg. Iedereen met dezelfde focus krijgt vandaag dezelfde workout.</p>
+    <div class="todaybtns">
+      <button class="btn" data-start>Start workout</button>
+      <button class="btn ghost" data-remix>Andere mix</button>
+    </div>`;
+  const grid=$("#exgrid");
+  list.forEach((ex,i)=>{
+    const li=document.createElement("li");
+    li.innerHTML=`<button class="exc" data-ex="${ex.id}"><span class="no num">${i+1}</span><i class="cat cat-${ex.c}" title="${CATN[ex.c]}"></i><span class="figbox"></span><span class="nm">${esc(ex.n)}</span></button>`;
+    const fig=W.makeFigure(ex); li.querySelector(".figbox").appendChild(fig); W.animate(fig);
+    grid.appendChild(li);
+  });
+}
+
+/* ---------- uitleg per oefening ---------- */
+function openDetail(id){
+  const ex=W.EX.find(e=>e.id===id); if(!ex) return;
+  const ov=$("#detail");
+  const extra=[ex.side?"Wissel halverwege van kant":"", ex.prop==="wall"?"Muur nodig":"", (ex.prop==="stepbox"||ex.prop==="bench"||ex.prop==="backbench")?"Stevige stoel of bank nodig":"", ex.jump?"Met sprongen":""].filter(Boolean);
+  ov.innerHTML=`<div class="panel detail" role="dialog" aria-modal="true" aria-labelledby="dh">
+    <div class="figbox" style="width:100%;display:grid;place-items:center"></div>
+    <h2 id="dh" style="font-size:26px">${esc(ex.n)}</h2>
+    <div class="meta"><span class="pill"><i class="cat cat-${ex.c}"></i>${CATN[ex.c]}</span>${extra.map(x=>`<span class="pill">${x}</span>`).join("")}</div>
+    <p style="color:var(--fg);font-weight:600">${esc(ex.tip)}</p>
+    ${ex.easy?`<div class="easy"><b>Makkelijker:</b> ${esc(ex.easy)}</div>`:""}
+    <button class="btn" data-dclose style="width:100%">Sluiten</button></div>`;
+  const fig=W.makeFigure(ex); ov.querySelector(".figbox").appendChild(fig); W.animate(fig);
+  ov.hidden=false; ov.querySelector("[data-dclose]").focus();
+}
+function closeDetail(){ const ov=$("#detail"); ov.hidden=true; ov.innerHTML=""; }
+$("#detail").addEventListener("click",e=>{ if(e.target.id==="detail") closeDetail(); });
+
+/* ---------- geluid ---------- */
+let actx=null;
+function beep(freq=880,dur=0.12,vol=0.18){
+  if(!prefs.sound) return;
+  try{
+    actx = actx || new (window.AudioContext||window.webkitAudioContext)();
+    const o=actx.createOscillator(), g=actx.createGain(); o.type="sine"; o.frequency.value=freq;
+    g.gain.setValueAtTime(vol,actx.currentTime); g.gain.exponentialRampToValueAtTime(0.001,actx.currentTime+dur);
+    o.connect(g).connect(actx.destination); o.start(); o.stop(actx.currentTime+dur+0.02);
+  }catch(e){}
+}
+let nlVoice=null;
+function pickVoice(){ try{ const v=speechSynthesis.getVoices(); nlVoice=v.find(x=>/^nl/i.test(x.lang))||null; }catch(e){} }
+try{ pickVoice(); speechSynthesis.onvoiceschanged=pickVoice; }catch(e){}
+function say(text){
+  if(!prefs.sound) return;
+  try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text); u.lang="nl-NL"; if(nlVoice) u.voice=nlVoice; u.rate=1.05; speechSynthesis.speak(u); }catch(e){}
+}
+const soundIcon=()=>prefs.sound
+  ? `<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`
+  : `<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 9l5 6M21 9l-5 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`;
+
+/* ---------- timer ---------- */
+let T=null, wakeLock=null;
 function openTimer(){
-  tState={i:0,phase:"work",left:WORK,paused:false};
-  $("#timer").hidden=false; drawTimer();
+  const list=todaysWorkout();
+  const phases=[{type:"prep",i:0,dur:PREP}];
+  list.forEach((ex,i)=>{ phases.push({type:"work",i,dur:WORK}); if(i<list.length-1) phases.push({type:"rest",i:i+1,dur:REST}); });
+  T={list,phases,p:0,end:0,left:0,paused:false,lastSec:null,switched:false};
+  try{ actx = actx || new (window.AudioContext||window.webkitAudioContext)(); actx.resume&&actx.resume(); }catch(e){}
+  $("#timer").hidden=false;
   try{ navigator.wakeLock && navigator.wakeLock.request("screen").then(l=>wakeLock=l).catch(()=>{}); }catch(e){}
-  tState.iv=setInterval(tick,1000);
+  startPhase(0);
+  T.iv=setInterval(tick,200);
 }
-function closeTimer(){ if(tState) clearInterval(tState.iv); tState=null; $("#timer").hidden=true; try{wakeLock&&wakeLock.release();}catch(e){} wakeLock=null; }
+function closeTimer(){
+  if(T) clearInterval(T.iv); T=null; $("#timer").hidden=true; $("#timer").innerHTML="";
+  try{ speechSynthesis.cancel(); }catch(e){}
+  try{ wakeLock&&wakeLock.release(); }catch(e){} wakeLock=null;
+}
+function startPhase(n){
+  T.p=n; const ph=T.phases[n]; T.end=Date.now()+ph.dur*1000; T.lastSec=null; T.switched=false;
+  const ex=T.list[ph.i];
+  if(ph.type==="work"){ beep(1046,0.35,0.22); say(ex.n); }
+  else if(ph.type==="rest"){ beep(523,0.3); say("Rust. Hierna: "+ex.n); }
+  else say("Maak je klaar. Eerste oefening: "+ex.n);
+  drawPhase();
+}
+function finish(){
+  closeTimer(); beep(784,0.15); setTimeout(()=>beep(1046,0.15),160); setTimeout(()=>beep(1318,0.4),320);
+  const p=people.find(x=>x.id===me);
+  if(!p){ toast("Goed gedaan! Kies je naam bovenaan om de workout af te vinken."); fireConfetti(); return; }
+  if(isDone(p,todayKey())){ toast("Extra workout gedaan. Sterk!"); fireConfetti(); return; }
+  markToday();
+}
+function skipPhase(){ if(!T) return; if(T.paused){ T.paused=false; } if(T.p>=T.phases.length-1) return finish(); startPhase(T.p+1); }
+function togglePause(){
+  if(!T) return;
+  if(T.paused){ T.end=Date.now()+T.left; T.paused=false; }
+  else { T.left=T.end-Date.now(); T.paused=true; try{ speechSynthesis.cancel(); }catch(e){} }
+  const b=$("[data-tpause]"); if(b) b.textContent=T.paused?"Verder":"Pauze";
+}
 function tick(){
-  if(!tState||tState.paused) return;
-  tState.left--;
-  if(tState.left<=0) advance(); else drawTimer();
+  if(!T||T.paused) return;
+  const ms=T.end-Date.now(), ph=T.phases[T.p];
+  if(ms<=0){ if(T.p>=T.phases.length-1) return finish(); return startPhase(T.p+1); }
+  const sec=Math.ceil(ms/1000);
+  if(sec!==T.lastSec){
+    T.lastSec=sec;
+    if(sec<=3) beep(660,0.1);
+    const ex=T.list[ph.i];
+    if(ph.type==="work" && ex.side && !T.switched && sec<=WORK/2){ T.switched=true; beep(880,0.12); setTimeout(()=>beep(880,0.12),180); say("Wissel van kant"); const s=$("#sideslot"); if(s) s.innerHTML=`<div class="switchside">Wissel van kant!</div>`; }
+  }
+  const t=$("#tsec"); if(t) t.textContent=sec;
+  const r=$("#tring"); if(r){ const C=2*Math.PI*44; r.setAttribute("stroke-dashoffset",(C*(1-ms/(ph.dur*1000))).toFixed(1)); }
 }
-function advance(){
-  if(tState.phase==="work"){
-    if(tState.i>=EXERCISES.length-1){ closeTimer(); markToday(); return; }
-    tState.phase="rest"; tState.left=REST;
-  } else { tState.i++; tState.phase="work"; tState.left=WORK; }
-  drawTimer();
+function drawPhase(){
+  const ph=T.phases[T.p], ex=T.list[ph.i], C=2*Math.PI*44;
+  const label = ph.type==="work" ? `Oefening ${ph.i+1} van ${T.list.length}` : ph.type==="rest" ? "Rust · hierna" : "Klaar maken · eerst";
+  const col = ph.type==="work" ? "var(--green)" : "var(--sky)";
+  const next = ph.type==="work" && T.list[ph.i+1] ? `<div class="upnext">Hierna: ${esc(T.list[ph.i+1].n)}</div>` : "";
+  $("#timer").innerHTML=`<div class="tpanel" role="dialog" aria-modal="true" aria-label="Workout timer">
+    <div class="top2">
+      <div class="progress">${T.list.map((_,j)=>`<i class="${j<ph.i?"on":(j===ph.i&&ph.type==="work")?"cur":""}"></i>`).join("")}</div>
+      <button class="iconbtn" data-tsound aria-label="${prefs.sound?"Geluid uit":"Geluid aan"}">${soundIcon()}</button>
+    </div>
+    <span class="phase ${ph.type==="work"?"":"rest"}">${label}</span>
+    <div class="tfig ${ph.type==="work"?"":"rest"}" id="tfig"></div>
+    <div class="tinfo">
+      <div class="exname">${esc(ex.n)}</div>
+      <div class="extip">${esc(ex.tip)}</div>
+      <div id="sideslot">${ex.side&&ph.type!=="work"?`<div class="upnext">Halverwege wissel je van kant.</div>`:""}</div>
+    </div>
+    <div class="tbottom">
+      <div class="ring"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="none" stroke="var(--miss)" stroke-width="9"/><circle id="tring" cx="50" cy="50" r="44" fill="none" stroke="${col}" stroke-width="9" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="0"/></svg><div class="t num" id="tsec">${ph.dur}</div></div>
+      <div class="tctrl">
+        <button class="btn sky small" data-tpause>${T.paused?"Verder":"Pauze"}</button>
+        <button class="btn ghost small" data-tskip>Overslaan</button>
+        <button class="btn ghost small" data-tstop>Stoppen</button>
+      </div>
+    </div>
+    ${next}
+  </div>`;
+  const fig=W.makeFigure(ex); $("#tfig").appendChild(fig); W.animate(fig);
 }
-function drawTimer(){
-  const s=tState, ex=EXERCISES[s.phase==="rest"?s.i+1:s.i], total=s.phase==="work"?WORK:REST;
-  const C=2*Math.PI*88, frac=s.left/total;
-  const col = s.phase==="work"?"var(--green)":"var(--sky)";
-  $("#timer").innerHTML=`<div class="panel" role="dialog" aria-modal="true" aria-label="Workout timer">
-    <div class="progress">${EXERCISES.map((_,j)=>`<i class="${j<s.i||(j===s.i&&s.phase==="rest")?"on":j===s.i?"cur":""}"></i>`).join("")}</div>
-    <span class="phase ${s.phase==="rest"?"rest":""}">${s.phase==="work"?`Oefening ${s.i+1} van 12`:"Rust · hierna"}</span>
-    <div class="exname">${ex[0]}</div>
-    <div class="extip">${ex[1]}</div>
-    <div class="timer-ring"><svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="88" fill="none" stroke="var(--miss)" stroke-width="14"/><circle cx="100" cy="100" r="88" fill="none" stroke="${col}" stroke-width="14" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${(C*(1-frac)).toFixed(1)}" style="transition:stroke-dashoffset 1s linear"/></svg><div class="t num">${s.left}</div></div>
-    <div class="row2" style="width:100%">
-      <button class="btn ghost small" data-tstop>Stoppen</button>
-      <button class="btn sky small" data-tpause>${s.paused?"Verder":"Pauze"}</button>
-      <button class="btn ghost small" data-tskip>Overslaan</button>
-    </div></div>`;
+function fireConfetti(){
+  if(typeof confetti!=="function" || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const c=["#4CB81B","#FF8A1F","#F5B700","#1CA8E8","#CE82FF"];
+  confetti({particleCount:140,spread:80,origin:{y:.6},colors:c,zIndex:100});
 }
+
 
 /* ---------- events ---------- */
 document.addEventListener("click",e=>{
@@ -488,15 +680,21 @@ document.addEventListener("click",e=>{
   else if(b.dataset.wk){ weekOffset+=Number(b.dataset.wk); renderHero(); }
   else if("start" in b.dataset){ openTimer(); }
   else if("close" in b.dataset){ $("#celebrate").hidden=true; }
+  else if(b.dataset.focus){ setPref("focus",b.dataset.focus); variant=0; renderToday(); }
+  else if("nojump" in b.dataset){ setPref("nojump",!prefs.nojump); variant=0; renderToday(); }
+  else if("remix" in b.dataset){ variant++; renderToday(); }
+  else if(b.dataset.ex){ openDetail(b.dataset.ex); }
+  else if("dclose" in b.dataset){ closeDetail(); }
   else if("tstop" in b.dataset){ closeTimer(); }
-  else if("tpause" in b.dataset){ tState.paused=!tState.paused; drawTimer(); }
-  else if("tskip" in b.dataset){ advance(); }
+  else if("tpause" in b.dataset){ togglePause(); }
+  else if("tskip" in b.dataset){ skipPhase(); }
+  else if("tsound" in b.dataset){ setPref("sound",!prefs.sound); b.innerHTML=soundIcon(); b.setAttribute("aria-label",prefs.sound?"Geluid uit":"Geluid aan"); }
 });
 document.addEventListener("submit",e=>{
   if(e.target.id==="joinform"){ e.preventDefault(); join($("#joinname").value); }
   if(e.target.id==="gateform"){ e.preventDefault(); groupCode=$("#gatecode").value.trim(); try{ localStorage.setItem("zmc-code",groupCode); }catch(_){} $("#gate").hidden=true; load(); }
 });
-document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ if(!$("#celebrate").hidden) $("#celebrate").hidden=true; } });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ if(!$("#celebrate").hidden) $("#celebrate").hidden=true; else if(!$("#detail").hidden) closeDetail(); } });
 
 /* ---------- boot ---------- */
 let dbFailed=false;
