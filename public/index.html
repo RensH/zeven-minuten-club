@@ -569,7 +569,7 @@ async function join(name){
 const W = window.ZMC_EX;
 const prefs = {focus:"mix", nojump:false, sound:true, music:"off"};
 try{ Object.assign(prefs, JSON.parse(localStorage.getItem("zmc-prefs")||"{}")); }catch(e){}
-if(prefs.music==="lofi") prefs.music="energy";
+if(prefs.music==="lofi"||prefs.music==="power") prefs.music="energy";
 function setPref(k,v){ prefs[k]=v; try{ localStorage.setItem("zmc-prefs",JSON.stringify(prefs)); }catch(e){} }
 let variant=0;
 const CATN = W.CAT;
@@ -580,7 +580,7 @@ function todaysWorkout(){
 function needsText(list){
   const n=new Set(list.map(e=>e.prop).filter(Boolean));
   const parts=[]; if(n.has("stepbox")||n.has("bench")||n.has("backbench")) parts.push("een stevige stoel of bank"); if(n.has("wall")) parts.push("een muur");
-  return parts.length ? "Nodig: "+parts.join(" en ")+"." : "Geen spullen nodig.";
+  return parts.length ? "Nodig: "+parts.join(" en ")+"." : "";
 }
 function renderToday(){
   const el=$("#today"); const list=todaysWorkout();
@@ -594,7 +594,6 @@ function renderToday(){
     </div>
     <ol class="exgrid" id="exgrid"></ol>
     <div class="setrow"><span class="setl">Muziek</span><div class="seg" role="group" aria-label="Muziek">${Object.entries(MUSIC).map(([k,m])=>`<button class="fchip sm" data-music="${k}" aria-pressed="${(prefs.music||"off")===k}">${m.label}</button>`).join("")}</div></div>
-    <p class="needs" style="margin-top:-4px">Tik op een muziekstijl om 6 seconden te luisteren. De muziek wordt in je browser gemaakt, dus geen rechten of internet nodig.</p>
     <p class="needs">${needsText(list)} Tik op een oefening voor uitleg. Iedereen met dezelfde focus krijgt vandaag dezelfde workout.</p>
     <div class="todaybtns">
       <button class="btn" data-start>Start workout</button>
@@ -648,7 +647,7 @@ function beep(freq=880,dur=0.12,vol=0.18){
 /* ---------- stem: alleen Engels, korte coach-zinnen ----------
    Staan er echte opnames in /voice (zie voice/README.md), dan worden die gebruikt.
    Anders valt de app terug op de beste Engelse stem van het apparaat. */
-const CUES={ready:"Get ready!", rest:"Rest.", side:"Switch sides!", half:"Halfway there!", last:"Last one. Give it everything!", three:"Three!", two:"Two!", one:"One!", done:"Workout complete. Great job!"};
+const CUES={ready:"Get ready!", rest:"Rest.", side:"Switch sides!", half:"Halfway there!", last:"Last one. Give it everything!", three:"three", two:"two", one:"one", done:"Workout complete. Great job!"};
 const clips={}; let clipsLoaded=false;
 async function loadClips(){
   if(clipsLoaded) return; clipsLoaded=true;
@@ -675,16 +674,24 @@ function warmVoice(){
   try{ const u=new SpeechSynthesisUtterance(" "); u.lang="en-US"; if(enVoice) u.voice=enVoice; u.volume=0; speechSynthesis.speak(u); }catch(e){}
   if(!enVoice){ let n=0; const iv=setInterval(()=>{ if(pickVoice()||++n>20) clearInterval(iv); },150); }
 }
+function freshVoice(){
+  try{ const all=speechSynthesis.getVoices(); if(enVoice){ const v=all.find(x=>x.name===enVoice.name && x.lang===enVoice.lang); if(v) return v; } }catch(e){}
+  return pickVoice();
+}
+function speakNow(text){
+  const u=new SpeechSynthesisUtterance(text), v=freshVoice();
+  u.lang="en-US"; if(v){ u.voice=v; u.lang=v.lang; }
+  u.rate=1.12; u.pitch=1.08; u.volume=1;
+  u.onstart=()=>duck(true); u.onend=()=>duck(false); u.onerror=()=>duck(false);
+  speechSynthesis.speak(u);
+}
+let speakT=0;
 function speak(text, interrupt=true){
   if(!prefs.sound) return;
   try{
-    if(!enVoice) pickVoice();
-    if(interrupt) speechSynthesis.cancel();
-    const u=new SpeechSynthesisUtterance(text); u.lang="en-US";
-    if(enVoice){ u.voice=enVoice; u.lang=enVoice.lang; }
-    u.rate=1.12; u.pitch=1.08; u.volume=1;
-    u.onstart=()=>duck(true); u.onend=()=>duck(false); u.onerror=()=>duck(false);
-    speechSynthesis.speak(u);
+    clearTimeout(speakT);
+    if(interrupt && (speechSynthesis.speaking||speechSynthesis.pending)){ speechSynthesis.cancel(); speakT=setTimeout(()=>speakNow(text),70); }
+    else speakNow(text);
   }catch(e){}
 }
 let clipSrc=null;
@@ -712,8 +719,7 @@ const mtof=m=>440*Math.pow(2,(m-69)/12);
 const MUSIC={
   off:{label:"Uit"},
   energy:{label:"Energiek", bpm:138, custom:energyStep},
-  house:{label:"House", bpm:126, custom:houseStep},
-  power:{label:"Hard", bpm:150, custom:powerStep, gain:0.45},
+  house:{label:"House", bpm:128, custom:houseStep},
   chip:{label:"8-bit", bpm:144, custom:chipStep, gain:1.5}
 };
 let noiseBuf=null, mus={timer:0, next:0, step:0, style:"off"};
@@ -797,39 +803,35 @@ function crash(t){
   n.buffer=noise(); n.loop=true; f.type="highpass"; f.frequency.value=4000; env(g,t,0.22,0.005,1.6);
   n.connect(f).connect(g).connect(musicBus); n.start(t); n.stop(t+1.7);
 }
-/* House 126: four-on-the-floor, open hats op de offbeat, pianoakkoorden, groovende bas.
-   Delen: groove -> piano erbij -> break zonder kick -> alles. */
+/* House 128: four-on-the-floor, open hats, pianoakkoorden en een groovende bas.
+   Delen: groove -> piano en percussie -> break met opbouw (roffel en ruis) -> drop met hook en pompende akkoorden. */
 const H_PROG=[[53,57,60,64],[55,59,62,65],[52,55,59,62],[57,60,64,67]];
 const H_PIANO=[0,3,6,10,13], H_BASS=[[0,0],[3,7],[6,12],[8,0],[11,7],[14,10]];
+const H_HOOK=[[3,null,3,null,2,null,3,null,null,4,null,3,2,null,0,null],[0,null,2,3,null,3,null,2,0,null,null,2,null,3,4,null]];
+const H_PERC=[3,7,11,14];
 function houseStep(st,step,t){
   const {bar,s,sec,bIn,tr}=arr(step,[0,2,-3,5]), b16=60/st.bpm/4, ch=H_PROG[bar%4].map(m=>m+tr), root=ch[0]-24;
-  const brk=sec===2;
-  if(!brk || bIn>=6){ if(s%4===0) drum("kick",t); }
-  if(!brk && (s===4||s===12)) drum("clap",t,0.8);
-  if(s%4===2) drum("ohat",t,brk?0.5:1);
-  if(sec>=1) drum("shaker",t,s%2?0.6:1);
-  if(bIn%4===3 && s>=13 && !brk) drum("snare",t,0.6);
-  if(!brk) for(const [st2,iv] of H_BASS) if(s===st2) tone(mtof(root+iv),t,b16*1.5,"sawtooth",0.16,600,{q:6});
-  if(brk && s===0) tone(mtof(root),t,b16*14,"sine",0.25);
-  if(sec>=1 && H_PIANO.includes(s)) ch.forEach((m,k)=>{ tone(mtof(m+12),t,b16*(brk?6:2.2),"triangle",0.05,3000); tone(mtof(m+24),t,b16*1.2,"sine",0.018); });
-  if(brk && s===0) ch.forEach(m=>tone(mtof(m),t,b16*15,"sawtooth",0.02,900+bIn*200,{att:0.3}));
-  if(sec===3 && [0,6,8,14].includes(s)) tone(mtof(ch[(s/2)%4]+24),t,b16*1.8,"square",0.03,2500,{detune:8});
-  if(sec===3 && bIn===0 && s===0) crash(t);
-}
-/* Hard 150: vervormde kick, rollende offbeat-bas, krijsende lead in de drop. */
-const P_PROG=[[57,60,64],[57,60,64],[53,57,60],[55,59,62]];
-const P_LEAD=[0,null,0,1,null,0,2,null,0,null,0,1,null,3,2,null];
-function powerStep(st,step,t){
-  const {bar,s,sec,bIn,tr}=arr(step,[0,-2,3,1]), b16=60/st.bpm/4, ch=P_PROG[bar%4].map(m=>m+tr), root=ch[0]-24;
-  if(sec!==2){ if(s%4===0) drum("kick",t,1,{hard:true}); }
-  else { if(bIn<6 && s%4===0) drum("kick",t,0.9,{hard:true}); const ev=bIn<2?8:bIn<4?4:bIn<6?2:1; if(s%ev===0){ drum("snare",t,0.9); if(bIn>=4) drum("clap",t,0.7); } if(bIn===0&&s===0) riser(t,b16*16*8); }
-  if(sec!==2 && (s===4||s===12)) { drum("clap",t,1); drum("snare",t,0.6); }
-  if(sec>=1 && sec!==2) drum("hat",t,s%4===2?1.2:0.6);
-  if(sec===0 && s%4===2) drum("ohat",t);
-  if(sec!==2 && s%4!==0) tone(mtof(root+(s%4===2?12:0)),t,b16*0.85,"sawtooth",0.22,1400,{dist:true,sweep:300});
-  if(sec===2 && s%2===0) tone(mtof(root),t,b16*1.6,"sawtooth",0.1+bIn*0.02,400+bIn*250,{dist:true});
-  if(sec===3){ const n=P_LEAD[s]; if(n!=null){ const m=[ch[0],ch[1],ch[2],ch[0]+12][n]+12; tone(mtof(m),t,b16*1.5,"sawtooth",0.06,5000,{detune:-12}); tone(mtof(m),t,b16*1.5,"sawtooth",0.06,5000,{detune:12}); } if(bIn===0&&s===0) crash(t); }
-  if(sec===1 && s===0) ch.forEach(m=>tone(mtof(m+12),t,b16*14,"sawtooth",0.025,1600,{detune:10,att:0.2}));
+  const brk=sec===2, drop=sec===3, tones=[ch[0],ch[1],ch[2],ch[3],ch[0]+12];
+  // drums
+  if(!brk || bIn>=6){ if(s%4===0 && !(brk && bIn===7 && s>=8)) drum("kick",t); }
+  if(!brk && (s===4||s===12)) drum("clap",t,0.85);
+  if(s%4===2) drum("ohat",t,brk?0.4:1);
+  if(sec>=1 && !brk) drum("shaker",t,s%2?0.6:1);
+  if(drop && s%2===1) drum("hat",t,0.5);
+  if(sec>=1 && !brk && H_PERC.includes(s)) tone(mtof(s===14?50:57),t,b16*1.2,"sine",0.12,0,{slide:0.7});
+  if(bIn%4===3 && s>=12 && !brk) drum("snare",t,0.55);
+  // break: roffel die versnelt en ruis die opbouwt naar de drop
+  if(brk){ const ev=bIn<4?16:bIn<6?4:bIn<7?2:1; if(bIn>=2 && s%ev===0) drum("snare",t,0.35+bIn*0.08); if(bIn===2&&s===0) riser(t,b16*16*6); }
+  // bas: in de drop met een filter dat opengaat
+  if(!brk) for(const [st2,iv] of H_BASS) if(s===st2) tone(mtof(root+iv),t,b16*1.5,"sawtooth",0.16,drop?900+bIn*80:600,{q:7});
+  if(brk && s===0) tone(mtof(root),t,b16*14,"sine",0.22);
+  // piano
+  if(sec>=1 && !drop && H_PIANO.includes(s)) ch.forEach(m=>{ tone(mtof(m+12),t,b16*(brk?6:2.2),"triangle",0.05,3000); tone(mtof(m+24),t,b16*1.2,"sine",0.016); });
+  // drop: pompende akkoorden op de offbeat en een hook
+  if(drop && s%4===2) ch.forEach(m=>tone(mtof(m+12),t,b16*1.6,"sawtooth",0.03,2800,{detune:7}));
+  if(drop){ const n=H_HOOK[bar%2][s]; if(n!=null){ tone(mtof(tones[n]+24),t,b16*1.6,"square",0.035,3200); tone(mtof(tones[n]+12),t,b16*1.6,"triangle",0.03,2500); } }
+  if(brk && s===0) ch.forEach(m=>tone(mtof(m),t,b16*15,"sawtooth",0.02,700+bIn*260,{att:0.3}));
+  if(drop && bIn===0 && s===0) crash(t);
 }
 /* 8-bit 144: arpeggio, melodie, brug met andere akkoorden en een refrein met tweede stem. */
 const C_PROG=[[[60,64,67],[55,59,62],[57,60,64],[53,57,60]],[[53,57,60],[55,59,62],[52,55,59],[57,60,64]]];
@@ -948,7 +950,7 @@ function startPhase(n){
   const ex=T.list[ph.i];
   restQuiet = ph.type!=="work"; setMusicLevel();
   if(ph.type==="work"){ const last=ph.i===T.list.length-1, name=ex.en; startJingle(); setTimeout(()=>{ if(T) speak(last?`Last one! ${name}`:name); },380); }
-  else if(ph.type==="rest") cue("rest");
+  else if(ph.type==="rest") setTimeout(()=>{ if(T && T.phases[T.p]===ph) cue("rest"); },350);
   else cue("ready");
   drawPhase();
 }
@@ -1027,7 +1029,7 @@ function drawPhase(){
   const fig=W.makeFigure(ex); $("#tfig").insertBefore(fig,$("#countbig")); W.animate(fig);
 }
 function cycleMusic(){
-  const order=["off","energy","house","power","chip"], i=order.indexOf(prefs.music||"off"), nx=order[(i+1)%order.length];
+  const order=["off","energy","house","chip"], i=order.indexOf(prefs.music||"off"), nx=order[(i+1)%order.length];
   setPref("music",nx); if(T&&!T.paused) startMusic(nx);
   const b=$("[data-tmusic] span"); if(b) b.textContent=MUSIC[nx].label;
 }
