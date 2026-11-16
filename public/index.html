@@ -567,7 +567,7 @@ async function join(name){
 
 /* ---------- workout van vandaag ---------- */
 const W = window.ZMC_EX;
-const prefs = {focus:"mix", nojump:false, sound:true, voice:"en", music:"off"};
+const prefs = {focus:"mix", nojump:false, sound:true, music:"off"};
 try{ Object.assign(prefs, JSON.parse(localStorage.getItem("zmc-prefs")||"{}")); }catch(e){}
 if(prefs.music==="lofi") prefs.music="energy";
 function setPref(k,v){ prefs[k]=v; try{ localStorage.setItem("zmc-prefs",JSON.stringify(prefs)); }catch(e){} }
@@ -593,7 +593,6 @@ function renderToday(){
       <span class="catlegend">${Object.entries(CATN).map(([k,v])=>`<span><i class="cat cat-${k}"></i>${v}</span>`).join("")}</span>
     </div>
     <ol class="exgrid" id="exgrid"></ol>
-    <div class="setrow"><span class="setl">Stem</span><div class="seg" role="group" aria-label="Stem">${[["en","Engels"],["nl","Nederlands"],["off","Uit"]].map(([k,l])=>`<button class="fchip sm" data-voice="${k}" aria-pressed="${(prefs.voice||"en")===k}">${l}</button>`).join("")}</div></div>
     <div class="setrow"><span class="setl">Muziek</span><div class="seg" role="group" aria-label="Muziek">${Object.entries(MUSIC).map(([k,m])=>`<button class="fchip sm" data-music="${k}" aria-pressed="${(prefs.music||"off")===k}">${m.label}</button>`).join("")}</div></div>
     <p class="needs" style="margin-top:-4px">Tik op een muziekstijl om 6 seconden te luisteren. De muziek wordt in je browser gemaakt, dus geen rechten of internet nodig.</p>
     <p class="needs">${needsText(list)} Tik op een oefening voor uitleg. Iedereen met dezelfde focus krijgt vandaag dezelfde workout.</p>
@@ -646,32 +645,50 @@ function beep(freq=880,dur=0.12,vol=0.18){
   }catch(e){}
 }
 
-/* ---------- stem (Engels of Nederlands) ---------- */
-const VOICES={
-  en:{lang:"en-US", ready:n=>`Get ready. First up: ${n}.`, go:n=>`${n}. Go!`, rest:n=>`Rest. Next up: ${n}.`, side:"Switch sides!", count:["One","Two","Three"], half:"Halfway there!", done:"Workout complete. Great job!", last:"Last one. Give it everything!"},
-  nl:{lang:"nl-NL", ready:n=>`Maak je klaar. Eerste oefening: ${n}.`, go:n=>`${n}. Start!`, rest:n=>`Rust. Hierna: ${n}.`, side:"Wissel van kant!", count:["Een","Twee","Drie"], half:"Halverwege!", done:"Workout voltooid. Goed gedaan!", last:"Laatste oefening. Geef alles!"}
-};
-const V=()=>VOICES[prefs.voice]||VOICES.en;
-const exName=ex=>prefs.voice==="nl"?ex.n:ex.en;
-let voices={};
-function pickVoices(){
+/* ---------- stem: alleen Engels, korte coach-zinnen ----------
+   Staan er echte opnames in /voice (zie voice/README.md), dan worden die gebruikt.
+   Anders valt de app terug op de beste Engelse stem van het apparaat. */
+const CUES={ready:"Get ready!", go:"Go!", rest:"Rest.", side:"Switch sides!", half:"Halfway there!", last:"Last one. Give it everything!", three:"Three!", two:"Two!", one:"One!", done:"Workout complete. Great job!"};
+const clips={}; let clipsLoaded=false;
+async function loadClips(){
+  if(clipsLoaded) return; clipsLoaded=true;
   try{
-    const all=speechSynthesis.getVoices();
-    const best=lang=>{ const c=all.filter(v=>v.lang.replace("_","-").toLowerCase().startsWith(lang)); return c.find(v=>/natural|premium|enhanced|google|samantha|ava|allison|xander|claire/i.test(v.name))||c[0]||null; };
-    voices={en:best("en-us")||best("en"), nl:best("nl")};
+    const r=await fetch("voice/clips.json",{cache:"no-store"}); if(!r.ok) return;
+    const list=await r.json(); const a=ac();
+    await Promise.all(Object.entries(list).map(async([k,file])=>{ try{ const b=await (await fetch("voice/"+file)).arrayBuffer(); clips[k]=await a.decodeAudioData(b); }catch(e){} }));
   }catch(e){}
 }
-try{ pickVoices(); speechSynthesis.onvoiceschanged=pickVoices; }catch(e){}
-function say(text, interrupt=true){
-  if(!prefs.sound || prefs.voice==="off") return;
+let enVoice=null;
+function pickVoice(){
   try{
-    if(interrupt) speechSynthesis.cancel();
-    const u=new SpeechSynthesisUtterance(text), v=V(); u.lang=v.lang;
-    const vc=voices[prefs.voice==="nl"?"nl":"en"]; if(vc) u.voice=vc;
-    u.rate=1.04;
+    const all=speechSynthesis.getVoices().filter(v=>/^en[-_]/i.test(v.lang));
+    const pref=[/natural/i,/premium/i,/enhanced/i,/google us english/i,/ava|allison|aria|jenny|samantha|zoe|evan|nathan/i,/en[-_]us/i];
+    enVoice=null; for(const re of pref){ enVoice=all.find(v=>re.test(v.name)||re.test(v.lang)); if(enVoice) break; }
+    if(!enVoice) enVoice=all[0]||null;
+  }catch(e){}
+}
+try{ pickVoice(); speechSynthesis.onvoiceschanged=pickVoice; }catch(e){}
+let clipSrc=null;
+function cue(key){
+  if(!prefs.sound) return;
+  const a=ac();
+  if(clips[key] && a){
+    try{ if(clipSrc) clipSrc.stop(); }catch(e){}
+    const s=a.createBufferSource(), g=a.createGain(); g.gain.value=1; s.buffer=clips[key]; s.connect(g).connect(a.destination);
+    duck(true); s.onended=()=>duck(false); s.start(); clipSrc=s; return;
+  }
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(CUES[key]); u.lang="en-US"; if(enVoice) u.voice=enVoice;
+    u.rate=1.12; u.pitch=1.08; u.volume=1;
     u.onstart=()=>duck(true); u.onend=()=>duck(false); u.onerror=()=>duck(false);
     speechSynthesis.speak(u);
   }catch(e){}
+}
+// startdeuntje: vrolijk oplopend akkoordje
+function startJingle(){
+  if(!prefs.sound) return;
+  [[784,0],[988,0.09],[1175,0.18],[1568,0.27]].forEach(([f,d])=>setTimeout(()=>beep(f,d===0.27?0.35:0.12,0.2),d*1000));
 }
 const soundIcon=()=>prefs.sound
   ? `<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`
@@ -830,7 +847,7 @@ function openTimer(){
   const phases=[{type:"prep",i:0,dur:PREP}];
   list.forEach((ex,i)=>{ phases.push({type:"work",i,dur:WORK}); if(i<list.length-1) phases.push({type:"rest",i:i+1,dur:REST}); });
   T={list,phases,p:0,end:0,left:0,paused:false,lastSec:null,switched:false,halved:false,skipped:0,started:Date.now()};
-  ac();
+  ac(); loadClips();
   $("#timer").hidden=false;
   try{ navigator.wakeLock && navigator.wakeLock.request("screen").then(l=>wakeLock=l).catch(()=>{}); }catch(e){}
   startMusic(prefs.music||"off");
@@ -845,18 +862,17 @@ function closeTimer(){
 }
 function startPhase(n){
   T.p=n; const ph=T.phases[n]; T.end=Date.now()+ph.dur*1000; T.lastSec=null; T.switched=false; T.halved=false;
-  const ex=T.list[ph.i], v=V();
   restQuiet = ph.type!=="work"; setMusicLevel();
-  if(ph.type==="work"){ beep(1046,0.35,0.22); say(ph.i===T.list.length-1 ? v.last : v.go(exName(ex))); }
-  else if(ph.type==="rest") say(v.rest(exName(ex)));
-  else say(v.ready(exName(ex)));
+  if(ph.type==="work"){ const k=ph.i===T.list.length-1?"last":"go"; startJingle(); setTimeout(()=>{ if(T) cue(k); },120); }
+  else if(ph.type==="rest") cue("rest");
+  else cue("ready");
   drawPhase();
 }
 function finish(){
   const sum={skipped:T?T.skipped:0, total:T?T.list.length:12, secs:T?Math.round((Date.now()-T.started)/1000):0, focus:(W.FOCUS[prefs.focus]||W.FOCUS.mix).label};
   closeTimer();
   beep(784,0.15); setTimeout(()=>beep(1046,0.15),160); setTimeout(()=>beep(1318,0.45),320);
-  setTimeout(()=>say(V().done),500);
+  setTimeout(()=>cue("done"),500);
   const p=people.find(x=>x.id===me);
   if(!p){ toast("Goed gedaan! Kies je naam bovenaan om de workout af te vinken."); fireConfetti(); return; }
   if(isDone(p,todayKey())){ celebrate(sum,true); return; }
@@ -884,15 +900,11 @@ function tick(){
   const sec=Math.ceil(ms/1000);
   if(sec!==T.lastSec){
     T.lastSec=sec;
-    const ex=T.list[ph.i], v=V();
-    if(sec<=3){
-      beep(sec===1?880:660,0.12);
-      showCount(sec);
-      // voor elke oefening hardop aftellen; aan het eind van een oefening alleen piepjes
-      if(ph.type!=="work") say(v.count[sec-1], true);
-    }
-    if(ph.type==="work" && ex.side && !T.switched && sec<=WORK/2){ T.switched=true; beep(880,0.12); setTimeout(()=>beep(880,0.12),180); say(v.side); const s=$("#sideslot"); if(s) s.innerHTML=`<div class="switchside">Wissel van kant!</div>`; }
-    if(ph.type==="work" && !ex.side && !T.halved && ph.i===Math.floor(T.list.length/2) && sec<=WORK/2){ T.halved=true; say(v.half); }
+    const ex=T.list[ph.i];
+    // aftellen aan het eind van elke oefening; de rust blijft rustig
+    if(ph.type==="work" && sec<=3){ beep(sec===1?880:660,0.12); showCount(sec); cue(["one","two","three"][sec-1]); }
+    if(ph.type==="work" && ex.side && !T.switched && sec<=WORK/2){ T.switched=true; beep(880,0.12); setTimeout(()=>beep(880,0.12),180); cue("side"); const s=$("#sideslot"); if(s) s.innerHTML=`<div class="switchside">Wissel van kant!</div>`; }
+    if(ph.type==="work" && !ex.side && !T.halved && ph.i===Math.floor(T.list.length/2) && sec<=WORK/2 && sec>5){ T.halved=true; cue("half"); }
   }
   const t=$("#tsec"); if(t) t.textContent=sec;
   const r=$("#tring"); if(r){ const C=2*Math.PI*44; r.setAttribute("stroke-dashoffset",(C*(1-ms/(ph.dur*1000))).toFixed(1)); }
@@ -965,7 +977,6 @@ document.addEventListener("click",e=>{
   else if("tstop" in b.dataset){ closeTimer(); }
   else if("tpause" in b.dataset){ togglePause(); }
   else if("tskip" in b.dataset){ skipPhase(); }
-  else if(b.dataset.voice){ setPref("voice",b.dataset.voice); renderToday(); if(b.dataset.voice!=="off"){ ac(); say(b.dataset.voice==="nl"?"Zo klinkt de Nederlandse stem.":"This is how the English voice sounds."); } }
   else if(b.dataset.music){ setPref("music",b.dataset.music); renderToday(); ac(); previewMusic(b.dataset.music); }
   else if("tmusic" in b.dataset){ cycleMusic(); }
   else if("tsound" in b.dataset){ setPref("sound",!prefs.sound); b.innerHTML=soundIcon(); b.setAttribute("aria-label",prefs.sound?"Geluid uit":"Geluid aan"); }
