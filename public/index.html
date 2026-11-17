@@ -647,9 +647,11 @@ function beep(freq=880,dur=0.12,vol=0.18){
 /* ---------- stem: alleen Engels, korte coach-zinnen ----------
    Staan er echte opnames in /voice (zie voice/README.md), dan worden die gebruikt.
    Anders valt de app terug op de beste Engelse stem van het apparaat. */
-const CUES={ready:"Get ready!", rest:"Rest.", side:"Switch sides!", half:"Halfway there!", last:"Last one. Give it everything!", three:"three", two:"two", one:"one", done:"Workout complete. Great job!"};
+const CUES={ready:"Get ready!", last:"Last one!", rest:"Rest.", side:"Switch sides!", half:"Halfway there!", last:"Last one. Give it everything!", three:"three", two:"two", one:"one", done:"Workout complete. Great job!"};
 const clips={}; let clipsLoaded=false;
-async function loadClips(){
+let clipsPromise=null;
+function loadClips(){ return clipsPromise || (clipsPromise=loadClipsNow()); }
+async function loadClipsNow(){
   if(clipsLoaded) return; clipsLoaded=true;
   try{
     const r=await fetch("voice/clips.json",{cache:"no-store"}); if(!r.ok) return;
@@ -695,16 +697,19 @@ function speak(text, interrupt=true){
   }catch(e){}
 }
 let clipSrc=null;
-function cue(key){
+// Speelt opnames van de Piper-stem (Amy) na elkaar af; valt alleen terug op de apparaatstem als een opname ontbreekt
+function playClips(keys, fallback){
   if(!prefs.sound) return;
   const a=ac();
-  if(clips[key] && a){
-    try{ if(clipSrc) clipSrc.stop(); }catch(e){}
-    const s=a.createBufferSource(); s.buffer=clips[key]; s.connect(a.destination);
-    duck(true); s.onended=()=>duck(false); s.start(); clipSrc=s; return;
-  }
-  speak(CUES[key]);
+  if(!a || !keys.every(k=>clips[k])){ if(fallback) speak(fallback); return; }
+  try{ if(clipSrc) clipSrc.stop(); }catch(e){}
+  try{ speechSynthesis.cancel(); }catch(e){}
+  let t=a.currentTime+0.02, last=null;
+  duck(true);
+  for(const k of keys){ const s=a.createBufferSource(), g=a.createGain(); g.gain.value=1.15; s.buffer=clips[k]; s.connect(g).connect(a.destination); s.start(t); t+=clips[k].duration+0.08; last=s; }
+  last.onended=()=>duck(false); clipSrc=last;
 }
+function cue(key){ playClips([key], CUES[key]); }
 // startdeuntje: vrolijk oplopend akkoordje
 function startJingle(){
   if(!prefs.sound) return;
@@ -927,7 +932,12 @@ const medalSvg=`<svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="tru
 
 /* ---------- timer ---------- */
 let T=null, wakeLock=null;
-function openTimer(){
+async function openTimer(){
+  if(T) return;
+  ac();
+  const b=document.querySelectorAll("[data-start]"); b.forEach(x=>{ x.disabled=true; });
+  await Promise.race([loadClips(), new Promise(r=>setTimeout(r,4000))]);
+  b.forEach(x=>{ x.disabled=false; });
   const list=todaysWorkout();
   const phases=[{type:"prep",i:0,dur:PREP}];
   list.forEach((ex,i)=>{ phases.push({type:"work",i,dur:WORK}); if(i<list.length-1) phases.push({type:"rest",i:i+1,dur:REST}); });
@@ -949,7 +959,7 @@ function startPhase(n){
   T.p=n; const ph=T.phases[n]; T.end=Date.now()+ph.dur*1000; T.lastSec=null; T.switched=false; T.halved=false;
   const ex=T.list[ph.i];
   restQuiet = ph.type!=="work"; setMusicLevel();
-  if(ph.type==="work"){ const last=ph.i===T.list.length-1, name=ex.en; startJingle(); setTimeout(()=>{ if(T) speak(last?`Last one! ${name}`:name); },380); }
+  if(ph.type==="work"){ const last=ph.i===T.list.length-1, keys=last?["last","ex-"+ex.id]:["ex-"+ex.id], text=last?`Last one! ${ex.en}`:ex.en; startJingle(); setTimeout(()=>{ if(T) playClips(keys,text); },380); }
   else if(ph.type==="rest") setTimeout(()=>{ if(T && T.phases[T.p]===ph) cue("rest"); },350);
   else cue("ready");
   drawPhase();

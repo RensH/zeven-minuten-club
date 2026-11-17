@@ -1,26 +1,15 @@
 # Stemopnames
 
-Zet hier korte opnames van een echte stem (mp3 of m4a, mono is prima) en maak een `clips.json`
-die zegt welk bestand bij welke zin hoort. Zolang `clips.json` ontbreekt, gebruikt de app de
-Engelse stem van het apparaat.
+De coach-stem is **Amy** (`en_US-amy-medium`) van [Piper](https://github.com/OHF-Voice/piper1-gpl).
+Alle zinnen en de Engelse namen van de oefeningen zijn vooraf als mp3 gemaakt, zodat de app
+geen stem van het apparaat nodig heeft. `clips.json` koppelt elke sleutel aan een bestand.
 
-| sleutel | zin                              |
-|---------|----------------------------------|
-| ready   | Get ready!                       |
-| rest    | Rest.                            |
-| side    | Switch sides!                    |
-| half    | Halfway there!                   |
-| last    | Last one. Give it everything!    |
-| three   | Three!                           |
-| two     | Two!                             |
-| one     | One!                             |
-| done    | Workout complete. Great job!     |
+- Coach-zinnen: `ready`, `rest`, `side`, `half`, `last`, `done`
+- Aftellen: `three`, `two`, `one`
+- Oefeningen: `ex-<id>` (bijvoorbeeld `ex-pushups`)
 
-Voorbeeld `clips.json`:
+Opnieuw maken (bijvoorbeeld na het toevoegen van een oefening): zet `en_US-amy-medium.onnx` en
+`en_US-amy-medium.onnx.json` in `tools/` en draai `python3 tools/stem-genereren.py`.
 
-```json
-{ "ready": "ready.mp3", "rest": "rest.mp3", "side": "side.mp3", "half": "half.mp3",
-  "last": "last.mp3", "three": "three.mp3", "two": "two.mp3", "one": "one.mp3", "done": "done.mp3" }
-```
-
-Een sleutel die ontbreekt valt terug op de apparaatstem.
+Stem: Piper-stem "amy", getraind op een dataset van het Mycroft mimic3-project; zie het
+MODEL_CARD van de stem voor de licentie.
