@@ -569,7 +569,7 @@ async function join(name){
 const W = window.ZMC_EX;
 const prefs = {focus:"mix", nojump:false, sound:true, music:"off"};
 try{ Object.assign(prefs, JSON.parse(localStorage.getItem("zmc-prefs")||"{}")); }catch(e){}
-if(prefs.music==="lofi"||prefs.music==="power") prefs.music="energy";
+if(["lofi","power","chip"].includes(prefs.music)) prefs.music="energy";
 function setPref(k,v){ prefs[k]=v; try{ localStorage.setItem("zmc-prefs",JSON.stringify(prefs)); }catch(e){} }
 let variant=0;
 const CATN = W.CAT;
@@ -725,7 +725,8 @@ const MUSIC={
   off:{label:"Uit"},
   energy:{label:"Energiek", bpm:138, custom:energyStep},
   house:{label:"House", bpm:128, custom:houseStep},
-  chip:{label:"8-bit", bpm:144, custom:chipStep, gain:1.5}
+  melodic:{label:"Melodic", bpm:129, custom:melodicStep, gain:1.1},
+  tech:{label:"Tech house", bpm:124, custom:techStep, gain:1.0}
 };
 let noiseBuf=null, mus={timer:0, next:0, step:0, style:"off"};
 function noise(){ if(noiseBuf) return noiseBuf; const a=ac(); noiseBuf=a.createBuffer(1,a.sampleRate*0.5,a.sampleRate); const d=noiseBuf.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1; return noiseBuf; }
@@ -746,7 +747,7 @@ function tone(f,t,dur,wave,vol,cut,opt={}){
 }
 function drum(kind,t,vol=1,opt={}){
   const a=actx;
-  if(kind==="kick"){ const o=a.createOscillator(), g=a.createGain(); o.frequency.setValueAtTime(opt.hard?190:150,t); o.frequency.exponentialRampToValueAtTime(opt.hard?42:45,t+(opt.hard?0.16:0.12)); o.connect(g).connect(opt.hard?dist():musicBus); env(g,t,0.9*vol,0.002,opt.hard?0.32:0.22); o.start(t); o.stop(t+0.4); return; }
+  if(kind==="kick"){ const o=a.createOscillator(), g=a.createGain(); o.frequency.setValueAtTime(opt.hard?190:opt.punch?180:150,t); o.frequency.exponentialRampToValueAtTime(opt.hard?42:opt.punch?62:45,t+(opt.hard?0.16:opt.punch?0.07:0.12)); o.connect(g).connect(opt.hard?dist():musicBus); env(g,t,0.9*vol,0.002,opt.hard?0.32:0.22); o.start(t); o.stop(t+0.4); return; }
   const n=a.createBufferSource(); n.buffer=noise(); const f=a.createBiquadFilter(), g=a.createGain();
   if(kind==="hat"){ f.type="highpass"; f.frequency.value=7000; env(g,t,0.12*vol,0.001,0.05); }
   else if(kind==="ohat"){ f.type="highpass"; f.frequency.value=6500; env(g,t,0.1*vol,0.002,0.22); }
@@ -838,27 +839,50 @@ function houseStep(st,step,t){
   if(brk && s===0) ch.forEach(m=>tone(mtof(m),t,b16*15,"sawtooth",0.02,700+bIn*260,{att:0.3}));
   if(drop && bIn===0 && s===0) crash(t);
 }
-/* 8-bit 144: arpeggio, melodie, brug met andere akkoorden en een refrein met tweede stem. */
-const C_PROG=[[[60,64,67],[55,59,62],[57,60,64],[53,57,60]],[[53,57,60],[55,59,62],[52,55,59],[57,60,64]]];
-const C_MEL=[[0,null,2,null,4,null,2,3,4,null,null,2,null,1,0,null],[4,null,3,2,null,0,null,2,1,null,0,null,1,2,null,null],[0,2,4,null,5,null,4,2,null,3,null,2,1,null,0,null]];
-function chipStep(st,step,t){
-  const {bar,s,sec,bIn,tr}=arr(step,[0,2,5,-1]), b16=60/st.bpm/4, prog=C_PROG[sec===2?1:0], ch=prog[bar%4].map(m=>m+tr), root=ch[0]-12;
-  const scale=[ch[0],ch[1],ch[2],ch[0]+12,ch[1]+12,ch[2]+12];
-  // drums met ruis, fills elke 4 maten
-  if(s%8===0 || (sec===3 && s%4===0)) drum("kick",t,0.8);
-  if(sec>=1 && (s===4||s===12)) drum("snare",t,0.7);
-  if(s%2===0 && sec!==2) drum("hat",t,0.8);
-  if(bIn%4===3 && s>=12) drum("snare",t,0.6);
-  // bas: pulserend
-  if(s%2===0) tone(mtof(root+(s%8===4?7:0)),t,b16*1.2,"triangle",0.22);
-  // arpeggio
-  const arpVol = sec===1?0.018:0.03, arpLen=sec===3?1:2;
-  if(s%arpLen===0) tone(mtof(scale[(s/arpLen)%(sec===3?6:3)]+12),t,b16*0.7,"square",arpVol,4000);
-  // melodie (deel 2 en 4), in deel 4 met een tweede stem een octaaf hoger
-  if(sec===1||sec===3){ const n=C_MEL[bar%3][s]; if(n!=null){ tone(mtof(scale[n]+12),t,b16*1.8,"square",0.045,5000); if(sec===3) tone(mtof(scale[n]+24),t,b16*1.4,"square",0.02,6000); } }
-  // brug: trillende tonen
-  if(sec===2 && s%4===0) tone(mtof(scale[(bar+s/4)%6]+12),t,b16*3.5,"square",0.03,3000,{slide:1.06});
-  if(sec===3 && bIn===0 && s===0) tone(mtof(scale[3]+24),t,b16*8,"square",0.03,6000,{slide:0.5});
+/* Melodic 129 (naar het eerste deuntje): donker in F#-mineur met lange pad-akkoorden,
+   four-on-the-floor kick en een rollende bas op de 16en tussen de kicks.
+   Delen: intro met pad en opbouwende ruis -> groove -> heldere arpeggio-laag erbij -> piek met stop aan het eind. */
+const M_PROG=[[54,57,61],[54,57,61],[54,57,61],[55,59,62],[49,52,56],[54,57,61],[47,50,54],[47,50,54]]; // F#m F#m F#m G C#m F#m Bm Bm
+function melodicStep(st,step,t){
+  const {bar,s,sec,bIn,tr}=arr(step,[0,-2,3,0]), b16=60/st.bpm/4, ch=M_PROG[bar%8].map(m=>m+tr), root=ch[0]-12;
+  const kickOn = !(sec===0 && bIn<4) && !(sec===3 && bIn===7 && s>=8);
+  // pad: elke maat een lang, zacht aanzwellend akkoord
+  if(s===0 && !(sec===3 && bIn===7)) ch.concat([ch[0]+12]).forEach((m,k)=>{ tone(mtof(m),t,b16*16,"sawtooth",0.06,1500+(sec>=2?900:0),{detune:k%2?9:-9,att:0.35}); tone(mtof(m+12),t,b16*16,"triangle",0.02,0,{att:0.4}); });
+  if(sec===0 && bIn===0 && s===0) riser(t,b16*16*4);
+  if(kickOn && s%4===0) drum("kick",t,1,{punch:true});
+  // rollende bas: de drie 16en na elke kick
+  if(kickOn && s%4!==0){ const acc=s%4===3; tone(mtof(root+(s%4===2?12:0)),t,b16*0.85,"sawtooth",acc?0.34:0.17,acc?1400:900+(sec>=2?500:0)+bIn*40,{q:6}); }
+  if(kickOn && s%4===2) drum("ohat",t,0.8);
+  if(sec>=1 && kickOn) drum("hat",t,s%2?0.35:0.6);
+  if(sec===3 && (s===4||s===12) && kickOn) drum("clap",t,0.6);
+  // heldere laag vanaf deel 3: arpeggio in 16en
+  if(sec>=1 && kickOn){ const seq=[0,1,2,3,2,1,0,2]; const n=[ch[0],ch[1],ch[2],ch[0]+12][seq[s%8]]; tone(mtof(n+24),t,b16*0.9,"square",sec>=2?0.04:0.018,2800+bIn*150); }
+  if(sec===2 && bIn===0 && s===0) crash(t);
+}
+/* Tech house 124 (naar het tweede deuntje): diepe sub-bas op C die meepompt met de kick,
+   syncopische baspluks, drukke korte plukjes en veel hi-hats.
+   Delen: groove -> plukjes erbij -> break zonder kick met opbouw -> alles met akkoordstoten. */
+const T_PLUCK=[[0,0],[3,7],[6,4],[7,11],[10,6],[11,7],[14,12],[15,11]]; // stap, interval boven C (C E F# G B)
+function techStep(st,step,t){
+  const {bar,s,sec,bIn,tr}=arr(step,[0,2,-2,3]), b16=60/st.bpm/4, root=36+tr+(bar%8>=6?-2:0);
+  const brk=sec===2, kickOn=!brk || bIn>=6;
+  if(kickOn && s%4===0) drum("kick",t,1,{punch:true});
+  // sub-bas: per tel een lange toon die na de kick weer opkomt (pompend)
+  if(s%4===0){ tone(mtof(root),t+(kickOn?b16*0.6:0),b16*3.2,"sine",brk?0.14:0.2,0,{att:0.06}); tone(mtof(root+12),t+(kickOn?b16*0.6:0),b16*3.2,"triangle",0.1,0,{att:0.06}); }
+  // syncopische baspluks
+  if(kickOn && [3,7,10,11,15].includes(s)) tone(mtof(root),t,b16*0.8,"sawtooth",s%4===3?0.34:0.24,1100,{q:8});
+  // hi-hats: geshuffelde 16en, open hat op de offbeat, clap op 2 en 4
+  if(kickOn){ drum("hat",t+(s%2?b16*0.18:0),s%4===2?1:0.45); if(s%4===2) drum("ohat",t,0.7); }
+  if(sec>=1 && kickOn && (s===4||s===12)) drum("clap",t,0.8);
+  if(sec>=1) drum("shaker",t,0.7);
+  // drukke plukjes in C-lydisch
+  if(sec>=1){ for(const [st2,iv] of T_PLUCK) if(s===st2){ const m=root+24+iv+(bar%2&&s>8?12:0); tone(mtof(m),t,b16*0.7,"sawtooth",0.085,2200,{q:4}); tone(mtof(m-12),t,b16*0.5,"square",0.03,1500); } }
+  if(sec===0 && [2,6,9,13].includes(s)) tone(mtof(root+19),t,b16*0.6,"sawtooth",0.04,1800);
+  // break: roffel en ruis naar de drop
+  if(brk){ if(bIn===2&&s===0) riser(t,b16*16*6); const ev=bIn<4?16:bIn<6?4:2; if(bIn>=2 && s%ev===0) drum("snare",t,0.3+bIn*0.08); }
+  // drop: akkoordstoten (Cmaj7#11)
+  if((sec===3 && [0,6,10].includes(s)) || (sec===1 && s===6)) [0,4,7,11,18].forEach(iv=>tone(mtof(root+24+iv),t,b16*1.4,"sawtooth",0.035,2400,{detune:6}));
+  if(sec===3 && bIn===0 && s===0) crash(t);
 }
 function scheduleStep(st,step,t){
   if(st.custom) return st.custom(st,step,t);
@@ -1041,7 +1065,7 @@ function drawPhase(){
   const fig=W.makeFigure(ex); $("#tfig").insertBefore(fig,$("#countbig")); W.animate(fig);
 }
 function cycleMusic(){
-  const order=["off","energy","house","chip"], i=order.indexOf(prefs.music||"off"), nx=order[(i+1)%order.length];
+  const order=["off","energy","house","melodic","tech"], i=order.indexOf(prefs.music||"off"), nx=order[(i+1)%order.length];
   setPref("music",nx); if(T&&!T.paused) startMusic(nx);
   const b=$("[data-tmusic] span"); if(b) b.textContent=MUSIC[nx].label;
 }
