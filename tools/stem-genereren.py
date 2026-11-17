@@ -9,7 +9,7 @@ cfg = SynthesisConfig(length_scale=0.88, noise_scale=0.7, noise_w_scale=0.8)
 js = open(os.path.join(ROOT,'public','oefeningen.js')).read()
 EN = json.loads(re.search(r'const EN = (\{.*?\});', js).group(1))
 lines = {"ready":"Get ready!", "rest":"Rest.", "side":"Switch sides!", "half":"Halfway there!",
-         "last":"Last one!", "done":"Workout complete. Great job!", "three":"Three.", "two":"Two.", "one":"One."}
+         "last":"Last one!", "next":"Next,", "done":"Workout complete. Great job!", "three":"Three.", "two":"Two.", "one":"One."}
 for k,v in EN.items(): lines["ex-"+k] = v + "!"
 for k,text in lines.items():
     w = os.path.join(OUT,f"{k}.wav")

@@ -31,7 +31,7 @@ const EX = [
     A:P({a1:[-30,35], a2:[30,120], l1:[-8,-165], l2:[0,0], air:2}), B:P({a1:[30,120], a2:[-30,35], l1:[0,0], l2:[-8,-165], air:2}),
     K:[P({a1:[-30,35], a2:[30,120], l1:[-8,-165], l2:[0,0], air:2}), P({a1:[-5,30], a2:[5,40], l1:[2,0], l2:[-2,0], air:1}), P({a1:[30,120], a2:[-30,35], l1:[0,0], l2:[-8,-165], air:2}), P({a1:[-5,30], a2:[5,40], l1:[2,0], l2:[-2,0], air:1})], seg:0.2},
   {id:"climbers", n:"Mountain climbers", c:"c", tip:"Steunpositie op je handen. Trek om en om je knie naar je borst, heupen laag.", easy:"Zet je handen op een stoel of bank.",
-    A:PL({l1:[62,-35]}), B:PL({l2:[62,-35]}), speed:0.5},
+    A:PL({l1:[72,-58]}), B:PL({l2:[72,-58]}), speed:0.5},
   {id:"burpees", n:"Burpees", c:"c", jump:1, tip:"Hurk, handen op de grond, spring naar plank, terug naar hurkzit en spring omhoog.", easy:"Stap naar achteren en weer terug, sla de sprong over.",
     A:P({a1:[170,178], a2:[165,175], air:5}), B:{t:120, a1:[12,6], a2:[6,0], l1:[100,-25], l2:[96,-25]},
     K:[P({}), {t:150, a1:[30,20], a2:[26,16], l1:[70,-25], l2:[66,-25]}, {t:122, a1:[10,4], a2:[6,0], l1:[108,-22], l2:[104,-22]}, PL({}), {t:122, a1:[10,4], a2:[6,0], l1:[108,-22], l2:[104,-22]}, {t:150, a1:[90,90], a2:[86,86], l1:[70,-25], l2:[66,-25]}, P({a1:[172,178], a2:[168,176], air:8}), P({a1:[120,150], a2:[116,146]})], seg:0.4},
@@ -84,8 +84,9 @@ const EX = [
     A:BK({t:-62, l1:[118,-2], l2:[118,-2]}), B:BK({t:-62, l1:[165,95], l2:[118,-2]}), speed:0.8},
   {id:"kickback", n:"Staande kickbacks", c:"l", side:1, tip:"Handen op je heupen of tegen de muur. Duw één been gestrekt naar achteren en knijp je bil aan. Halverwege wisselen.", easy:"Kleinere beweging.",
     A:P({t:172, a1:[25,140], a2:[20,140], l1:[2,0], l2:[-2,0]}), B:P({t:165, a1:[25,140], a2:[20,140], l1:[-42,-38], l2:[-2,0]})},
-  {id:"standabduct", n:"Been zijwaarts heffen", c:"l", side:1, view:"front", tip:"Sta rechtop en til één gestrekt been opzij, zonder te kantelen. Rustig terug. Halverwege wisselen.", easy:"Houd je vast aan een stoel.",
-    A:F({a1:[55,-62], a2:[-55,62]}), B:F({t:184, a1:[55,-62], a2:[-55,62], l1:[38,38], l2:[-3,-1]})},
+  {id:"standabduct", n:"Squat met been opzij", c:"l", side:1, view:"front", tip:"Zak in een squat, kom krachtig omhoog en til bovenin één gestrekt been opzij. Halverwege van been wisselen.", easy:"Alleen het been opzij heffen, zonder squat.",
+    A:F({a1:[25,-115], a2:[-25,115]}), B:F({a1:[25,-115], a2:[-25,115], l1:[42,42]}),
+    K:[F({a1:[25,-115], a2:[-25,115]}), F({t:180, a1:[30,-110], a2:[-30,110], l1:[52,-14], l2:[-52,14]}), F({a1:[25,-115], a2:[-25,115]}), F({t:186, a1:[25,-115], a2:[-25,115], l1:[46,46], l2:[-3,-1]})], seg:0.5},
   {id:"lungeknee", n:"Lunge met knieheffing", c:"l", side:1, tip:"Stap naar achteren in een lunge en kom omhoog met die knie naar je borst. Halverwege van been wisselen.", easy:"Zonder knieheffing, gewoon terug naar staan.",
     A:P({a1:[-20,30], a2:[30,140], l1:[85,0], l2:[-12,-88]}), B:P({a1:[30,140], a2:[-20,30], l1:[0,0], l2:[100,0]}),
     K:[P({a1:[-20,30], a2:[30,140], l1:[85,0], l2:[-12,-88]}), P({a1:[0,20], a2:[0,20]}), P({a1:[30,140], a2:[-20,30], l1:[0,0], l2:[100,0]}), P({a1:[0,20], a2:[0,20]})], seg:0.5},
@@ -104,9 +105,10 @@ const EX = [
   {id:"taps", n:"Plank met schoudertikken", c:"u", tip:"Hoge plank. Tik om en om met je hand je andere schouder aan. Heupen stil houden.", easy:"Voeten wat verder uit elkaar of op je knieën.",
     A:PL({}), B:PL({a1:[45,-150]}), speed:0.6},
   {id:"pike", n:"Pike push-ups", c:"u", tip:"Billen hoog in een omgekeerde V. Buig je ellebogen en breng je hoofd richting de grond. Traint je schouders.", easy:"Kleinere beweging of voeten op de grond dichterbij.",
-    A:{t:40, a1:[25,25], a2:[25,25], l1:[-35,-35], l2:[-35,-35]}, B:{t:24, a1:[-45,32], a2:[-45,32], l1:[-36,-36], l2:[-36,-36]}},
+    A:{t:40, a1:[25,25], a2:[25,25], l1:[-35,-35], l2:[-35,-35]}, B:{t:14, a1:[-70,18], a2:[-70,18], l1:[-40,-40], l2:[-40,-40]}},
   {id:"updown", n:"Plank up-downs", c:"u", tip:"Wissel tussen onderarmplank en hoge plank, één arm per keer. Heupen zo stil mogelijk.", easy:"Op je knieën.",
-    A:PL({t:93, a1:[0,90], a2:[0,90]}), B:PL({})},
+    A:PL({t:93, a1:[0,90], a2:[0,90]}), B:PL({}),
+    K:[PL({t:93, a1:[0,90], a2:[0,90]}), PL({t:94, a1:[0,0], a2:[-28,28]}), PL({}), PL({t:94, a1:[-28,28], a2:[0,0]})], seg:0.55},
   {id:"inchworm", n:"Inchworms", c:"u", tip:"Buig voorover, loop met je handen naar een plank en loop weer terug. Benen zo recht mogelijk.", easy:"Knieën buigen mag.",
     A:{t:28, a1:[14,12], a2:[12,10], l1:[0,0], l2:[0,0]}, B:PL({}), speed:1.3},
   {id:"downdog", n:"Plank naar downward dog", c:"u", tip:"Duw vanuit de plank je billen omhoog naar een omgekeerde V, dan weer terug naar de plank.", easy:"Knieën licht gebogen.",
@@ -146,7 +148,7 @@ const EX = [
 ];
 
 // Engelse namen voor de stem
-const EN = {"jacks": "Jumping jacks", "highknees": "High knees", "buttkicks": "Butt kicks", "climbers": "Mountain climbers", "burpees": "Burpees", "squatjacks": "Squat jacks", "boxing": "Shadow boxing", "jumpsquats": "Jump squats", "jumplunges": "Jumping lunges", "squats": "Squats", "pulsesquats": "Pulse squats", "sumo": "Sumo squats", "wallsit": "Wall sit", "lunges": "Lunges", "revlunges": "Reverse lunges", "sidelunges": "Side lunges", "stepups": "Step-ups", "calfraises": "Calf raises", "bridge": "Glute bridge", "slbridge": "Single-leg glute bridge", "donkey": "Donkey kicks", "sideleg": "Side-lying leg raises", "goodmorning": "Good mornings", "hipthrust": "Hip thrusts", "bridgepulse": "Glute bridge pulses", "bridgemarch": "Glute bridge march", "kickback": "Standing kickbacks", "standabduct": "Standing leg raises", "lungeknee": "Reverse lunge with knee drive", "pushups": "Push-ups", "kneepush": "Knee push-ups", "diamond": "Diamond push-ups", "dips": "Triceps dips", "rotpush": "Push-up with rotation", "taps": "Plank shoulder taps", "pike": "Pike push-ups", "updown": "Plank up-downs", "inchworm": "Inchworms", "downdog": "Plank to downward dog", "armcircles": "Arm circles", "crabtoe": "Crab toe touches", "crunches": "Crunches", "plank": "Plank", "sideplank": "Side plank", "bicycle": "Bicycle crunches", "deadbug": "Dead bug", "legraises": "Leg raises", "flutter": "Flutter kicks", "hollow": "Hollow hold", "toetouch": "Toe touches", "russian": "Russian twists", "superman": "Superman", "birddog": "Bird dog", "standcrunch": "Standing knee crunch"};
+const EN = {"jacks": "Jumping jacks", "highknees": "High knees", "buttkicks": "Butt kicks", "climbers": "Mountain climbers", "burpees": "Burpees", "squatjacks": "Squat jacks", "boxing": "Shadow boxing", "jumpsquats": "Jump squats", "jumplunges": "Jumping lunges", "squats": "Squats", "pulsesquats": "Pulse squats", "sumo": "Sumo squats", "wallsit": "Wall sit", "lunges": "Lunges", "revlunges": "Reverse lunges", "sidelunges": "Side lunges", "stepups": "Step-ups", "calfraises": "Calf raises", "bridge": "Glute bridge", "slbridge": "Single-leg glute bridge", "donkey": "Donkey kicks", "sideleg": "Side-lying leg raises", "goodmorning": "Good mornings", "hipthrust": "Hip thrusts", "bridgepulse": "Glute bridge pulses", "bridgemarch": "Glute bridge march", "kickback": "Standing kickbacks", "standabduct": "Squat to side leg raise", "lungeknee": "Reverse lunge with knee drive", "pushups": "Push-ups", "kneepush": "Knee push-ups", "diamond": "Diamond push-ups", "dips": "Triceps dips", "rotpush": "Push-up with rotation", "taps": "Plank shoulder taps", "pike": "Pike push-ups", "updown": "Plank up-downs", "inchworm": "Inchworms", "downdog": "Plank to downward dog", "armcircles": "Arm circles", "crabtoe": "Crab toe touches", "crunches": "Crunches", "plank": "Plank", "sideplank": "Side plank", "bicycle": "Bicycle crunches", "deadbug": "Dead bug", "legraises": "Leg raises", "flutter": "Flutter kicks", "hollow": "Hollow hold", "toetouch": "Toe touches", "russian": "Russian twists", "superman": "Superman", "birddog": "Bird dog", "standcrunch": "Standing knee crunch"};
 for(const e of EX) e.en = EN[e.id] || e.n;
 
 /* ---------- poppetje: slanke illustratiestijl ----------
@@ -209,19 +211,19 @@ function anchorX(ex,j){
 /* Twee steunpunten (bv. tenen en handen): kantel het hele lichaam rond het eerste punt tot het tweede de grond raakt. */
 const CONTACT = {
   pushups:["toes",["h1","h2"]], diamond:["toes",["h1","h2"]], rotpush:["toes",["h1","h2"]], taps:["toes",["h1","h2"]],
-  climbers:["hands",["toe1","toe2"]], plank:["toes",["e1","e2","h1","h2"]], updown:["toes",["e1","e2","h1","h2"]],
+  climbers:["backtoe",["h1","h2"]], plank:["toes",["e1","e2","h1","h2"]], updown:["toes",["e1","e2","h1","h2"]],
   kneepush:["knees",["h1","h2"]], pike:["toes",["h1","h2"]], downdog:["toes",["h1","h2"]], inchworm:["toes",["h1","h2"]],
   sideplank:["toes",["h1","h2"]], birddog:["hands",["k1","k2"]], donkey:["hands",["k1","k2"]],
   bridge:["feet",["shb","head"]], bridgepulse:["feet",["shb","head"]], slbridge:["foot2",["shb","head"]], bridgemarch:["foot2",["shb","head"]]
 };
 // Liggende oefeningen: alleen de romp bepaalt de grond, zodat bewegende armen of benen het lichaam niet optillen
-const GROUNDBY = {legraises:["pel","shb"], deadbug:["pel","shb"], flutter:["pel"], hollow:["pel"], toetouch:["pel"], bicycle:["pel"], superman:["pel","shb"], sideleg:["pel","shb"]};
+const GROUNDBY = {climbers:["h1","h2"], legraises:["pel","shb"], deadbug:["pel","shb"], flutter:["pel"], hollow:["pel"], toetouch:["pel"], bicycle:["pel"], superman:["pel","shb"], sideleg:["pel","shb"]};
 const bottomOf=(j,k)=>j[k][1]+(RP[k]||0);
 const PIV={toes:["toe1","toe2"], hands:["h1","h2"], knees:["k1","k2"], feet:["heel1","heel2","toe1","toe2"], foot2:["heel2","toe2"]};
 const rotQ=(q,d)=>Object.assign({},q,{t:q.t-d, a1:[q.a1[0]-d,q.a1[1]-d], a2:[q.a2[0]-d,q.a2[1]-d], l1:[q.l1[0]-d,q.l1[1]-d], l2:[q.l2[0]-d,q.l2[1]-d]});
 function settle(ex,q,front){
   const c=CONTACT[ex.id]; if(!c) return q;
-  const pk=PIV[c[0]];
+  const pk=c[0]==="backtoe" ? [q.l1[0]<q.l2[0]?"toe1":"toe2"] : PIV[c[0]];
   const g=d=>{ const j=joints(rotQ(q,d),front); const pv=Math.max(...pk.map(k=>bottomOf(j,k))); return Math.max(...c[1].map(k=>bottomOf(j,k)))-pv; };
   // kantelhoek zoeken: steunpunt 2 even laag als steunpunt 1
   let lo=-35, hi=35, glo=g(lo), ghi=g(hi);

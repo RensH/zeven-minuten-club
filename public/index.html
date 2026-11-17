@@ -647,7 +647,7 @@ function beep(freq=880,dur=0.12,vol=0.18){
 /* ---------- stem: alleen Engels, korte coach-zinnen ----------
    Staan er echte opnames in /voice (zie voice/README.md), dan worden die gebruikt.
    Anders valt de app terug op de beste Engelse stem van het apparaat. */
-const CUES={ready:"Get ready!", last:"Last one!", rest:"Rest.", side:"Switch sides!", half:"Halfway there!", last:"Last one. Give it everything!", three:"three", two:"two", one:"one", done:"Workout complete. Great job!"};
+const CUES={ready:"Get ready!", last:"Last one!", next:"Next,", rest:"Rest.", side:"Switch sides!", half:"Halfway there!", last:"Last one. Give it everything!", three:"three", two:"two", one:"one", done:"Workout complete. Great job!"};
 const clips={}; let clipsLoaded=false;
 let clipsPromise=null;
 function loadClips(){ return clipsPromise || (clipsPromise=loadClipsNow()); }
@@ -959,9 +959,11 @@ function startPhase(n){
   T.p=n; const ph=T.phases[n]; T.end=Date.now()+ph.dur*1000; T.lastSec=null; T.switched=false; T.halved=false;
   const ex=T.list[ph.i];
   restQuiet = ph.type!=="work"; setMusicLevel();
-  if(ph.type==="work"){ const last=ph.i===T.list.length-1, keys=last?["last","ex-"+ex.id]:["ex-"+ex.id], text=last?`Last one! ${ex.en}`:ex.en; startJingle(); setTimeout(()=>{ if(T) playClips(keys,text); },380); }
-  else if(ph.type==="rest") setTimeout(()=>{ if(T && T.phases[T.p]===ph) cue("rest"); },350);
-  else cue("ready");
+  // bij de start alleen het deuntje; de naam van de oefening hoor je al in de rust ervoor
+  const last=ph.i===T.list.length-1, nx=last?["last","ex-"+ex.id]:["next","ex-"+ex.id], nxText=(last?"Last one! ":"Next, ")+ex.en;
+  if(ph.type==="work") startJingle();
+  else if(ph.type==="rest") setTimeout(()=>{ if(T && T.phases[T.p]===ph) playClips(["rest"].concat(nx),"Rest. "+nxText); },350);
+  else playClips(["ready"].concat(nx),"Get ready! "+nxText);
   drawPhase();
 }
 function finish(){
@@ -997,8 +999,8 @@ function tick(){
   if(sec!==T.lastSec){
     T.lastSec=sec;
     const ex=T.list[ph.i];
-    // aftellen aan het eind van elke oefening; de rust blijft rustig
-    if(ph.type==="work" && sec<=3){ beep(sec===1?880:660,0.12); showCount(sec); cue(["one","two","three"][sec-1]); }
+    // aftellen in de laatste 3 seconden van elke oefening én van de rust, op weg naar de volgende oefening
+    if(sec<=3){ beep(sec===1?880:660,0.12); showCount(sec); cue(["one","two","three"][sec-1]); }
     if(ph.type==="work" && ex.side && !T.switched && sec<=WORK/2){ T.switched=true; beep(880,0.12); setTimeout(()=>beep(880,0.12),180); cue("side"); const s=$("#sideslot"); if(s) s.innerHTML=`<div class="switchside">Wissel van kant!</div>`; }
     if(ph.type==="work" && !ex.side && !T.halved && ph.i===Math.floor(T.list.length/2) && sec<=WORK/2 && sec>5){ T.halved=true; cue("half"); }
   }
