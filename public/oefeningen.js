@@ -36,23 +36,23 @@ const EX = [
     A:P({a1:[170,178], a2:[165,175], air:5}), B:{t:120, a1:[12,6], a2:[6,0], l1:[100,-25], l2:[96,-25]},
     K:[P({}), {t:150, a1:[30,20], a2:[26,16], l1:[70,-25], l2:[66,-25]}, {t:122, a1:[10,4], a2:[6,0], l1:[108,-22], l2:[104,-22]}, PL({}), {t:122, a1:[10,4], a2:[6,0], l1:[108,-22], l2:[104,-22]}, {t:150, a1:[90,90], a2:[86,86], l1:[70,-25], l2:[66,-25]}, P({a1:[172,178], a2:[168,176], air:8}), P({a1:[120,150], a2:[116,146]})], seg:0.4},
   {id:"squatjacks", n:"Squat jacks", c:"c", jump:1, view:"front", tip:"Spring van smalle stand naar een brede squat en weer terug. Handen voor je borst.", easy:"Stap opzij naar de squat in plaats van te springen.",
-    A:F({a1:[25,-115], a2:[-25,115], l1:[5,0], l2:[-5,0]}), B:F({a1:[25,-115], a2:[-25,115], l1:[62,12], l2:[-62,-12]}),
-    K:[F({a1:[25,-115], a2:[-25,115], l1:[8,2], l2:[-8,-2]}), F({a1:[28,-112], a2:[-28,112], l1:[26,14], l2:[-26,-14], air:9}), F({a1:[25,-115], a2:[-25,115], l1:[62,12], l2:[-62,-12]}), F({a1:[28,-112], a2:[-28,112], l1:[26,14], l2:[-26,-14], air:9})], seg:0.32},
+    A:F({a1:[25,-115], a2:[-25,115], l1:[5,0], l2:[-5,0]}), B:F({a1:[25,-115], a2:[-25,115], l1:[78,16], l2:[-78,-16]}),
+    K:[F({a1:[25,-115], a2:[-25,115], l1:[8,2], l2:[-8,-2]}), F({a1:[28,-112], a2:[-28,112], l1:[26,14], l2:[-26,-14], air:9}), F({a1:[25,-115], a2:[-25,115], l1:[78,16], l2:[-78,-16]}), F({a1:[28,-112], a2:[-28,112], l1:[26,14], l2:[-26,-14], air:9})], seg:0.32},
   {id:"boxing", n:"Schaduwboksen", c:"c", tip:"Lichte spreidstand, stoot snel om en om recht vooruit. Blijf op je voorvoeten veren.", easy:"Rustiger tempo, focus op een rechte stoot.",
     A:P({a1:[90,90], a2:[45,165], l1:[18,4], l2:[-16,-2]}), B:P({a1:[45,165], a2:[90,90], l1:[18,4], l2:[-16,-2]}), speed:0.45},
   {id:"jumpsquats", n:"Squat jumps", c:"c", jump:1, tip:"Zak in een squat en spring explosief omhoog. Land zacht en zak direct weer door.", easy:"Kom op je tenen in plaats van te springen.",
-    A:{t:145, a1:[-30,-20], a2:[-25,-15], l1:[85,-25], l2:[82,-25]}, B:P({a1:[160,170], a2:[155,165], air:9}), speed:0.9},
+    A:{t:136, a1:[-30,-20], a2:[-25,-15], l1:[102,-34], l2:[100,-34]}, B:P({a1:[160,170], a2:[155,165], air:9}), speed:0.9},
   {id:"jumplunges", n:"Sprong-lunges", c:"c", jump:1, tip:"Vanuit een lunge spring je omhoog en wissel je in de lucht van been.", easy:"Wissel stappend van been, zonder sprong.",
     A:P({a1:[-30,20], a2:[40,120], l1:[85,0], l2:[-15,-88]}), B:P({a1:[40,120], a2:[-30,20], l1:[-15,-88], l2:[85,0]}),
     K:[P({a1:[-30,20], a2:[40,120], l1:[85,0], l2:[-15,-88]}), P({a1:[10,60], a2:[10,60], l1:[30,-20], l2:[20,-30], air:9}), P({a1:[40,120], a2:[-30,20], l1:[-15,-88], l2:[85,0]}), P({a1:[10,60], a2:[10,60], l1:[20,-30], l2:[30,-20], air:9})], seg:0.45},
 
   // ---------- BENEN & BILLEN ----------
   {id:"squats", n:"Squats", c:"l", tip:"Voeten op heupbreedte, billen naar achteren, knieën boven je tenen. Borst omhoog.", easy:"Zak minder diep of tik met je billen een stoel aan.",
-    A:P({a1:[90,90], a2:[88,88]}), B:{t:145, a1:[95,95], a2:[93,93], l1:[85,-25], l2:[82,-25]}},
+    A:P({a1:[90,90], a2:[88,88]}), B:{t:136, a1:[92,92], a2:[90,90], l1:[102,-34], l2:[100,-34]}},
   {id:"pulsesquats", n:"Pulserende squats", c:"l", tip:"Blijf onderin de squat en veer klein op en neer. Niet helemaal omhoogkomen.", easy:"Neem af en toe een korte pauze bovenin.",
-    A:{t:150, a1:[95,95], a2:[93,93], l1:[70,-22], l2:[68,-22]}, B:{t:145, a1:[95,95], a2:[93,93], l1:[88,-25], l2:[86,-25]}, speed:0.4},
+    A:{t:140, a1:[92,92], a2:[90,90], l1:[92,-30], l2:[90,-30]}, B:{t:136, a1:[92,92], a2:[90,90], l1:[104,-35], l2:[102,-35]}, speed:0.4},
   {id:"sumo", n:"Sumo squats", c:"l", view:"front", tip:"Brede stand, tenen naar buiten. Zak recht naar beneden, knieën naar buiten duwen.", easy:"Zak minder diep.",
-    A:F({a1:[25,-115], a2:[-25,115], l1:[22,16], l2:[-22,-16]}), B:F({a1:[25,-115], a2:[-25,115], l1:[68,14], l2:[-68,-14]})},
+    A:F({a1:[25,-115], a2:[-25,115], l1:[22,16], l2:[-22,-16]}), B:F({a1:[25,-115], a2:[-25,115], l1:[80,16], l2:[-80,-16]})},
   {id:"wallsit", n:"Wall sit", c:"l", prop:"wall", tip:"Rug plat tegen de muur, knieën in 90 graden. Volhouden en rustig doorademen.", easy:"Zak minder diep, bijvoorbeeld tot 45 graden.",
     A:{t:180, a1:[30,175], a2:[25,170], l1:[90,0], l2:[88,0]}, B:{t:180, a1:[30,170], a2:[25,165], l1:[90,0], l2:[88,0]}, hold:1},
   {id:"lunges", n:"Lunges", c:"l", tip:"Grote stap vooruit, zak tot je achterste knie bijna de grond raakt. Wissel af.", easy:"Kleinere stap en minder diep.",
@@ -86,7 +86,7 @@ const EX = [
     A:P({t:172, a1:[25,140], a2:[20,140], l1:[2,0], l2:[-2,0]}), B:P({t:165, a1:[25,140], a2:[20,140], l1:[-42,-38], l2:[-2,0]})},
   {id:"standabduct", n:"Squat met been opzij", c:"l", side:1, view:"front", tip:"Zak in een squat, kom krachtig omhoog en til bovenin één gestrekt been opzij. Halverwege van been wisselen.", easy:"Alleen het been opzij heffen, zonder squat.",
     A:F({a1:[25,-115], a2:[-25,115]}), B:F({a1:[25,-115], a2:[-25,115], l1:[42,42]}),
-    K:[F({a1:[25,-115], a2:[-25,115]}), F({t:180, a1:[30,-110], a2:[-30,110], l1:[52,-14], l2:[-52,14]}), F({a1:[25,-115], a2:[-25,115]}), F({t:186, a1:[25,-115], a2:[-25,115], l1:[46,46], l2:[-3,-1]})], seg:0.5},
+    K:[F({a1:[25,-115], a2:[-25,115]}), F({t:180, a1:[30,-110], a2:[-30,110], l1:[60,-28], l2:[-60,28]}), F({a1:[25,-115], a2:[-25,115]}), F({t:186, a1:[25,-115], a2:[-25,115], l1:[46,46], l2:[-3,-1]})], seg:0.5},
   {id:"lungeknee", n:"Lunge met knieheffing", c:"l", side:1, tip:"Stap naar achteren in een lunge en kom omhoog met die knie naar je borst. Halverwege van been wisselen.", easy:"Zonder knieheffing, gewoon terug naar staan.",
     A:P({a1:[-20,30], a2:[30,140], l1:[85,0], l2:[-12,-88]}), B:P({a1:[30,140], a2:[-20,30], l1:[0,0], l2:[100,0]}),
     K:[P({a1:[-20,30], a2:[30,140], l1:[85,0], l2:[-12,-88]}), P({a1:[0,20], a2:[0,20]}), P({a1:[30,140], a2:[-20,30], l1:[0,0], l2:[100,0]}), P({a1:[0,20], a2:[0,20]})], seg:0.5},
@@ -108,7 +108,7 @@ const EX = [
     A:{t:40, a1:[25,25], a2:[25,25], l1:[-35,-35], l2:[-35,-35]}, B:{t:14, a1:[-70,18], a2:[-70,18], l1:[-40,-40], l2:[-40,-40]}},
   {id:"updown", n:"Plank up-downs", c:"u", tip:"Wissel tussen onderarmplank en hoge plank, één arm per keer. Heupen zo stil mogelijk.", easy:"Op je knieën.",
     A:PL({t:93, a1:[0,90], a2:[0,90]}), B:PL({}),
-    K:[PL({t:93, a1:[0,90], a2:[0,90]}), PL({t:94, a1:[0,0], a2:[-28,28]}), PL({}), PL({t:94, a1:[-28,28], a2:[0,0]})], seg:0.55},
+    K:[PL({t:93, a1:[0,90], a2:[0,90]}), PL({t:93, a1:[0,90], a2:[0,90]}), PL({t:94, a1:[0,0], a2:[-28,28]}), PL({t:94, a1:[0,0], a2:[-28,28]}), PL({}), PL({}), PL({t:94, a1:[-28,28], a2:[0,0]}), PL({t:94, a1:[-28,28], a2:[0,0]})], seg:0.4, stops:1},
   {id:"inchworm", n:"Inchworms", c:"u", tip:"Buig voorover, loop met je handen naar een plank en loop weer terug. Benen zo recht mogelijk.", easy:"Knieën buigen mag.",
     A:{t:28, a1:[14,12], a2:[12,10], l1:[0,0], l2:[0,0]}, B:PL({}), speed:1.3},
   {id:"downdog", n:"Plank naar downward dog", c:"u", tip:"Duw vanuit de plank je billen omhoog naar een omgekeerde V, dan weer terug naar de plank.", easy:"Knieën licht gebogen.",
@@ -173,8 +173,10 @@ function joints(q, front){
   const k1=seg(hp1,q.l1[0],L.th), f1=seg(k1,q.l1[1],L.sh);
   const k2=seg(hp2,q.l2[0],L.th), f2=seg(k2,q.l2[1],L.sh);
   // voeten: zijaanzicht wijzen naar voren (haaks op scheen), vooraanzicht naar buiten
-  const fa1=front? q.l1[1]+70 : q.l1[1]+90-(q.f1||0);
-  const fa2=front? q.l2[1]-70 : q.l2[1]+90-(q.f2||0);
+  // staande voet blijft plat (wijst naar voren); bij een schuin of horizontaal scheenbeen volgt de voet het been
+  const flat=sh=>{ const a=Math.abs(sh); return a<=45 ? 90 : a>=75 ? sh+90 : 90+(sh+90-90)*((a-45)/30); };
+  const fa1=front? q.l1[1]+70 : flat(q.l1[1])-(q.f1||0);
+  const fa2=front? q.l2[1]-70 : flat(q.l2[1])-(q.f2||0);
   const toe1=seg(f1,fa1,front?3:L.foot), heel1=seg(f1,fa1,front?-0.5:-1.6);
   const toe2=seg(f2,fa2,front?3:L.foot), heel2=seg(f2,fa2,front?-0.5:-1.6);
   return {pel,neck,head,shb,sh1,sh2,hp1,hp2,e1,w1,h1,e2,w2,h2,k1,f1,k2,f2,toe1,toe2,heel1,heel2,up,face};
@@ -292,6 +294,7 @@ function el(tag,attrs,parent){ const e=document.createElementNS(NS,tag); for(con
 function poseAt(ex, t){ // t: 0..1 heen-en-terug (A/B) of rondgang door keyframes
   if(!ex.K) return mix(ex.A,ex.B,Math.max(0,Math.min(1,t)));
   const n=ex.K.length, x=((t%1)+1)%1*n, i=Math.floor(x), f=x-i;
+  if(ex.stops) return mix(ex.K[i],ex.K[(i+1)%n],0.5-0.5*Math.cos(f*Math.PI));
   const P0=ex.K[(i-1+n)%n], P1=ex.K[i], P2=ex.K[(i+1)%n], P3=ex.K[(i+2)%n];
   const cr=(a,b,c,d)=>0.5*((2*b)+(-a+c)*f+(2*a-5*b+4*c-d)*f*f+(-a+3*b-3*c+d)*f*f*f);
   const o={};
