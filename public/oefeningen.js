@@ -110,8 +110,9 @@ const EX = [
   {id:"updown", n:"Plank up-downs", c:"u", tip:"Wissel tussen onderarmplank en hoge plank, één arm per keer. Heupen zo stil mogelijk.", easy:"Op je knieën.",
     A:PL({t:93, a1:[0,90], a2:[0,90]}), B:PL({}),
     K:[PL({t:93, a1:[0,90], a2:[0,90]}), PL({t:93, a1:[0,90], a2:[0,90]}), PL({t:94, a1:[0,0], a2:[-28,28]}), PL({t:94, a1:[0,0], a2:[-28,28]}), PL({}), PL({}), PL({t:94, a1:[-28,28], a2:[0,0]}), PL({t:94, a1:[-28,28], a2:[0,0]})], seg:0.4, stops:1},
-  {id:"inchworm", n:"Inchworms", c:"u", tip:"Buig voorover, loop met je handen naar een plank en loop weer terug. Benen zo recht mogelijk.", easy:"Knieën buigen mag.",
-    A:{t:28, a1:[14,12], a2:[12,10], l1:[0,0], l2:[0,0]}, B:PL({}), speed:1.3},
+  {id:"inchworm", n:"Inchworms", c:"u", tip:"Buig vanuit staan voorover tot je handen voor je voeten op de grond staan. Loop met je handen naar voren tot een plank en loop weer terug. Benen zo recht mogelijk.", easy:"Knieën buigen mag.",
+    A:P({a1:[4,8], a2:[-4,0]}), B:{t:108, a1:[2,2], a2:[0,0], l1:[-72,-72], l2:[-72,-72]},
+    K:[P({a1:[4,8], a2:[-4,0]}), {t:30, a1:[42.5,42.5], a2:[40.5,40.5], l1:[0,0], l2:[0,0]}, {t:55, a1:[33.5,33.5], a2:[31.5,31.5], l1:[-28,-28], l2:[-28,-28]}, {t:108, a1:[2,2], a2:[0,0], l1:[-72,-72], l2:[-72,-72]}, {t:108, a1:[2,2], a2:[0,0], l1:[-72,-72], l2:[-72,-72]}, {t:55, a1:[33.5,33.5], a2:[31.5,31.5], l1:[-28,-28], l2:[-28,-28]}, {t:30, a1:[42.5,42.5], a2:[40.5,40.5], l1:[0,0], l2:[0,0]}, P({a1:[4,8], a2:[-4,0]})], seg:0.55, stops:1},
   {id:"downdog", n:"Plank naar downward dog", c:"u", tip:"Duw vanuit de plank je billen omhoog naar een omgekeerde V, dan weer terug naar de plank.", easy:"Knieën licht gebogen.",
     A:PL({}), B:{t:40, a1:[25,25], a2:[25,25], l1:[-35,-35], l2:[-35,-35]}, speed:1.1},
   {id:"armcircles", n:"Armcirkels", c:"u", view:"front", tip:"Armen gestrekt opzij op schouderhoogte. Maak kleine snelle cirkels, halverwege andere kant op.", easy:"Rustiger tempo.",
@@ -134,8 +135,8 @@ const EX = [
     A:BK({l1:[175,175], l2:[172,172]}), B:BK({l1:[100,100], l2:[98,98]})},
   {id:"flutter", n:"Flutter kicks", c:"k", tip:"Op je rug, benen gestrekt net boven de grond. Trappel klein en snel op en neer.", easy:"Benen hoger houden.",
     A:BK({t:-100, l1:[100,100], l2:[115,115]}), B:BK({t:-100, l1:[115,115], l2:[100,100]}), speed:0.35},
-  {id:"hollow", n:"Hollow hold", c:"k", tip:"Op je rug: armen boven je hoofd, schouders en benen van de grond. Onderrug blijft plat. Volhouden.", easy:"Knieën gebogen en armen langs je lichaam.",
-    A:BK({t:-112, a1:[-118,-118], a2:[-115,-115], l1:[108,108], l2:[106,106]}), B:BK({t:-110, a1:[-115,-115], a2:[-112,-112], l1:[106,106], l2:[104,104]}), hold:1},
+  {id:"hollow", n:"Hollow hold", c:"k", tip:"Op je rug met je onderrug plat tegen de grond. Til je schouderbladen en gestrekte benen net van de grond, armen boven je hoofd. Volhouden.", easy:"Knieën gebogen en armen langs je lichaam.",
+    A:BK({t:-100, a1:[-104,-104], a2:[-102,-102], l1:[104,104], l2:[102,102]}), B:BK({t:-99, a1:[-102,-102], a2:[-100,-100], l1:[103,103], l2:[101,101]}), hold:1},
   {id:"toetouch", n:"Teentikken", c:"k", tip:"Op je rug met je benen recht omhoog. Krul je bovenlijf op en tik met je handen je tenen.", easy:"Knieën licht gebogen.",
     A:BK({a1:[175,175], a2:[172,172], l1:[178,178], l2:[176,176]}), B:BK({t:-128, a1:[162,162], a2:[160,160], l1:[178,178], l2:[176,176]})},
   {id:"russian", n:"Russian twists", c:"k", tip:"Zit met je bovenlijf iets naar achteren en je voeten los. Draai je handen van links naar rechts.", easy:"Voeten op de grond.",
@@ -215,7 +216,7 @@ function anchorX(ex,j){
 const CONTACT = {
   pushups:["toes",["h1","h2"]], diamond:["toes",["h1","h2"]], rotpush:["toes",["h1","h2"]], taps:["toes",["h1","h2"]],
   climbers:["backtoe",["h1","h2"]], plank:["toes",["e1","e2","h1","h2"]], updown:["toes",["e1","e2","h1","h2"]],
-  kneepush:["knees",["h1","h2"]], pike:["toes",["h1","h2"]], downdog:["toes",["h1","h2"]], inchworm:["toes",["h1","h2"]],
+  kneepush:["knees",["h1","h2"]], pike:["toes",["h1","h2"]], downdog:["toes",["h1","h2"]],
   sideplank:["toes",["h1","h2"]], birddog:["hands",["k1","k2"]], donkey:["hands",["k1","k2"]],
   bridge:["feet",["shb","head"]], bridgepulse:["feet",["shb","head"]], slbridge:["foot2",["shb","head"]], bridgemarch:["foot2",["shb","head"]]
 };
