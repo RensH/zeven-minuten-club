@@ -27,9 +27,9 @@ const EX = [
     K:[F({a1:[8,4], a2:[-8,-4], l1:[4,0], l2:[-4,0]}), F({a1:[96,110], a2:[-96,-110], l1:[13,9], l2:[-13,-9], air:11}),
        F({a1:[162,170], a2:[-162,-170], l1:[24,15], l2:[-24,-15]}), F({a1:[96,110], a2:[-96,-110], l1:[13,9], l2:[-13,-9], air:11})], seg:0.22},
   {id:"highknees", n:"Hoge knieën", c:"c", tip:"Ren op de plaats en trek je knieën tot heuphoogte. Pomp mee met je armen.", easy:"Wandel in plaats van te rennen, knieën nog steeds hoog.",
-    A:P({t:174, a1:[-45,45], a2:[50,140], l1:[96,4], l2:[6,-8], f1:28, f2:22}), B:P({t:174, a1:[50,140], a2:[-45,45], l1:[6,-8], l2:[96,4], f1:22, f2:28}),
-    K:[P({t:174, a1:[-45,45], a2:[50,140], l1:[96,4], l2:[6,-8], f1:28, f2:22}), P({t:176, a1:[2,85], a2:[2,85], l1:[26,2], l2:[34,-48], f1:12, f2:30, air:3}),
-       P({t:174, a1:[50,140], a2:[-45,45], l1:[6,-8], l2:[96,4], f1:22, f2:28}), P({t:176, a1:[2,85], a2:[2,85], l1:[34,-48], l2:[26,2], f1:30, f2:12, air:3})], seg:0.18},
+    A:P({t:178, a1:[-40,48], a2:[45,138], l1:[96,2], l2:[3,-3], f1:28, f2:22}), B:P({t:178, a1:[45,138], a2:[-40,48], l1:[3,-3], l2:[96,2], f1:22, f2:28}),
+    K:[P({t:178, a1:[-40,48], a2:[45,138], l1:[96,2], l2:[3,-3], f1:28, f2:22}), P({t:178, a1:[2,85], a2:[2,85], l1:[38,-4], l2:[40,-16], f1:20, f2:30, air:3}),
+       P({t:178, a1:[45,138], a2:[-40,48], l1:[3,-3], l2:[96,2], f1:22, f2:28}), P({t:178, a1:[2,85], a2:[2,85], l1:[40,-16], l2:[38,-4], f1:30, f2:20, air:3})], seg:0.18},
   {id:"buttkicks", n:"Hielen naar billen", c:"c", tip:"Ren op de plaats en tik met je hielen tegen je billen. Bovenlijf rechtop.", easy:"Doe het wandelend, één been per keer.",
     A:P({a1:[-30,35], a2:[30,120], l1:[-8,-165], l2:[0,0], air:2}), B:P({a1:[30,120], a2:[-30,35], l1:[0,0], l2:[-8,-165], air:2}),
     K:[P({a1:[-30,35], a2:[30,120], l1:[-8,-165], l2:[0,0], air:2}), P({a1:[-5,30], a2:[5,40], l1:[2,0], l2:[-2,0], air:1}), P({a1:[30,120], a2:[-30,35], l1:[0,0], l2:[-8,-165], air:2}), P({a1:[-5,30], a2:[5,40], l1:[2,0], l2:[-2,0], air:1})], seg:0.2},
@@ -40,7 +40,8 @@ const EX = [
     K:[P({a1:[6,10], a2:[-6,-2]}), {t:142, a1:[42,42], a2:[38,38], l1:[86,-32], l2:[84,-32]}, {t:125, a1:[19,19], a2:[19,19], l1:[112,-28], l2:[112,-28]},
        {t:108, a1:[2,2], a2:[0,0], l1:[-72,-72], l2:[-72,-72]}, {t:108, a1:[2,2], a2:[0,0], l1:[-72,-72], l2:[-72,-72]},
        {t:125, a1:[19,19], a2:[19,19], l1:[112,-28], l2:[112,-28]}, {t:155, a1:[-35,-25], a2:[-32,-22], l1:[72,-30], l2:[70,-30]},
-       P({a1:[158,166], a2:[152,160], l1:[4,-4], l2:[-3,-8], air:7, f1:35, f2:35}), {t:166, a1:[70,80], a2:[66,76], l1:[48,-22], l2:[46,-22]}], seg:0.34},
+       P({a1:[158,166], a2:[152,160], l1:[4,-4], l2:[-3,-8], air:7, f1:35, f2:35}), {t:166, a1:[70,80], a2:[66,76], l1:[48,-22], l2:[46,-22]}],
+    dur:[0.9,0.7,1.1,0.4,1.1,0.7,0.5,0.5,0.8], seg:0.42},
   {id:"squatjacks", n:"Squat jacks", c:"c", jump:1, view:"front", tip:"Spring van smalle stand naar een brede squat en weer terug. Handen voor je borst.", easy:"Stap opzij naar de squat in plaats van te springen.",
     A:F({a1:[25,-115], a2:[-25,115], l1:[5,0], l2:[-5,0]}), B:F({a1:[25,-115], a2:[-25,115], l1:[78,16], l2:[-78,-16]}),
     K:[F({a1:[25,-115], a2:[-25,115], l1:[8,2], l2:[-8,-2]}), F({a1:[28,-112], a2:[-28,112], l1:[26,14], l2:[-26,-14], air:9}), F({a1:[25,-115], a2:[-25,115], l1:[78,16], l2:[-78,-16]}), F({a1:[28,-112], a2:[-28,112], l1:[26,14], l2:[-26,-14], air:9})], seg:0.32},
@@ -314,9 +315,26 @@ function polyD(polys, X){ return polys.map(p=>"M"+orient(p).map(X).join("L")+"Z"
 
 const NS="http://www.w3.org/2000/svg";
 function el(tag,attrs,parent){ const e=document.createElementNS(NS,tag); for(const k in attrs) e.setAttribute(k,attrs[k]); parent&&parent.appendChild(e); return e; }
+/* Eigen duur per stap en een spline zonder doorschieten: gelijke frames geven een echte stilstand, omkeerpunten remmen zacht af. */
+function poseMono(ex,t){
+  const K=ex.K, n=K.length, d=ex.dur, tot=d.reduce((a,b)=>a+b,0);
+  let T=((t%1)+1)%1*tot, i=0; while(i<n-1 && T>=d[i]){ T-=d[i]; i++; }
+  const h=d[i], f=Math.min(1,T/h), dp=d[(i-1+n)%n], dn=d[(i+1)%n];
+  const P0=K[(i-1+n)%n], P1=K[i], P2=K[(i+1)%n], P3=K[(i+2)%n];
+  const tan=(s0,s1)=>s0*s1<=0?0:2/(1/s0+1/s1);
+  const hm=(a,b,c,e)=>{ const s0=(b-a)/dp, s1=(c-b)/h, s2=(e-c)/dn, m1=tan(s0,s1), m2=tan(s1,s2), f2=f*f, f3=f2*f;
+    return (2*f3-3*f2+1)*b+(f3-2*f2+f)*h*m1+(-2*f3+3*f2)*c+(f3-f2)*h*m2; };
+  const o={};
+  for(const k of ["t","air","f1","f2","dx"]) o[k]=hm(P0[k]||0,P1[k]||0,P2[k]||0,P3[k]||0);
+  for(const k of ["a1","a2","l1","l2"]) o[k]=[0,1].map(m=>hm(P0[k][m],P1[k][m],P2[k][m],P3[k][m]));
+  o.air=Math.max(0,o.air);
+  return o;
+}
 function poseAt(ex, t){ // t: 0..1 heen-en-terug (A/B) of rondgang door keyframes
   if(!ex.K) return mix(ex.A,ex.B,Math.max(0,Math.min(1,t)));
-  const n=ex.K.length, x=((t%1)+1)%1*n, i=Math.floor(x), f=x-i;
+  const n=ex.K.length;
+  if(ex.dur) return poseMono(ex,t);
+  const x=((t%1)+1)%1*n, i=Math.floor(x), f=x-i;
   if(ex.stops) return mix(ex.K[i],ex.K[(i+1)%n],0.5-0.5*Math.cos(f*Math.PI));
   const P0=ex.K[(i-1+n)%n], P1=ex.K[i], P2=ex.K[(i+1)%n], P3=ex.K[(i+2)%n];
   const cr=(a,b,c,d)=>0.5*((2*b)+(-a+c)*f+(2*a-5*b+4*c-d)*f*f+(-a+3*b-3*c+d)*f*f*f);
@@ -424,7 +442,7 @@ function loop(now){
     if(!s.isConnected){ live.delete(s); continue; }
     const ex=s._ex;
     let t;
-    if(ex.K){ const period=ex.K.length*(ex.seg||0.6)*1000; t=(now%period)/period; }
+    if(ex.K){ const period=(ex.dur?ex.dur.reduce((a,b)=>a+b,0):ex.K.length)*(ex.seg||0.6)*1000; t=(now%period)/period; }
     else { const period=(ex.hold?3.2:(ex.speed||1)*1.6)*1000; const ph=(now % period)/period; t=0.5-0.5*Math.cos(ph*2*Math.PI); }
     draw(s,ex,t);
   }
