@@ -628,8 +628,23 @@ $("#detail").addEventListener("click",e=>{ if(e.target.id==="detail") closeDetai
 
 /* ---------- geluid: piepjes ---------- */
 let actx=null, musicBus=null;
+/* iOS: Web Audio volgt standaard de stille modus van de iPhone. Met de Audio Session API (iOS 17+)
+   en een stil, doorlopend <audio>-element meldt de app zich aan als mediaspeler, zodat stem,
+   piepjes en muziek ook in de stille modus te horen zijn, net als een video of podcast. */
+const SILENT="data:audio/wav;base64,UklGRkQDAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YSADAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==";
+let keepAlive=null;
+function mediaMode(on){
+  try{ if(navigator.audioSession) navigator.audioSession.type = on ? "playback" : "auto"; }catch(e){}
+  try{
+    if(on){
+      if(!keepAlive){ keepAlive=new Audio(SILENT); keepAlive.loop=true; keepAlive.setAttribute("playsinline",""); keepAlive.preload="auto"; }
+      const p=keepAlive.play(); if(p&&p.catch) p.catch(()=>{});
+    } else if(keepAlive){ keepAlive.pause(); }
+  }catch(e){}
+}
 function ac(){
   try{
+    mediaMode(true);
     if(!actx){ actx=new (window.AudioContext||window.webkitAudioContext)(); musicBus=actx.createGain(); musicBus.gain.value=0; musicBus.connect(actx.destination); }
     if(actx.state==="suspended") actx.resume();
   }catch(e){}
@@ -922,7 +937,7 @@ function previewMusic(style){
   clearTimeout(previewT);
   if(style==="off"){ stopMusic(); return; }
   const was=prefs.sound; if(!was) return toast("Zet eerst het geluid aan in de timer.");
-  startMusic(style); previewT=setTimeout(()=>{ if(!T) stopMusic(); },6000);
+  startMusic(style); previewT=setTimeout(()=>{ if(!T){ stopMusic(); mediaMode(false); } },6000);
 }
 
 /* ---------- XP, levels en badges ---------- */
@@ -977,6 +992,7 @@ function closeTimer(){
   if(T) clearInterval(T.iv); T=null; $("#timer").hidden=true; $("#timer").innerHTML="";
   try{ speechSynthesis.cancel(); }catch(e){}
   stopMusic(); restQuiet=false; ducked=false;
+  setTimeout(()=>{ if(!T && !mus.timer) mediaMode(false); },4000);
   try{ wakeLock&&wakeLock.release(); }catch(e){} wakeLock=null;
 }
 function startPhase(n){
