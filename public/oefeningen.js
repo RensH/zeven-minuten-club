@@ -23,18 +23,24 @@ const F = (o) => Object.assign({}, FRONT, o);
 const EX = [
   // ---------- CARDIO ----------
   {id:"jacks", n:"Jumping jacks", c:"c", jump:1, view:"front", tip:"Spring armen en benen tegelijk wijd en weer terug. Land zacht op je voorvoeten.", easy:"Stap om en om opzij in plaats van te springen.",
-    A:F({}), B:F({a1:[150,165], a2:[-150,-165], l1:[22,22], l2:[-22,-22], air:3})},
+    A:F({a1:[8,4], a2:[-8,-4], l1:[4,0], l2:[-4,0]}), B:F({a1:[162,170], a2:[-162,-170], l1:[24,15], l2:[-24,-15]}),
+    K:[F({a1:[8,4], a2:[-8,-4], l1:[4,0], l2:[-4,0]}), F({a1:[96,110], a2:[-96,-110], l1:[13,9], l2:[-13,-9], air:11}),
+       F({a1:[162,170], a2:[-162,-170], l1:[24,15], l2:[-24,-15]}), F({a1:[96,110], a2:[-96,-110], l1:[13,9], l2:[-13,-9], air:11})], seg:0.22},
   {id:"highknees", n:"Hoge knieën", c:"c", tip:"Ren op de plaats en trek je knieën tot heuphoogte. Pomp mee met je armen.", easy:"Wandel in plaats van te rennen, knieën nog steeds hoog.",
-    A:P({a1:[-35,40], a2:[35,130], l1:[95,0], l2:[-2,0], air:2}), B:P({a1:[35,130], a2:[-35,40], l1:[-2,0], l2:[95,0], air:2}),
-    K:[P({a1:[-35,40], a2:[35,130], l1:[95,0], l2:[-2,0], air:2}), P({a1:[-5,30], a2:[5,40], l1:[2,0], l2:[-2,0], air:1}), P({a1:[35,130], a2:[-35,40], l1:[-2,0], l2:[95,0], air:2}), P({a1:[-5,30], a2:[5,40], l1:[2,0], l2:[-2,0], air:1})], seg:0.2},
+    A:P({t:174, a1:[-45,45], a2:[50,140], l1:[96,4], l2:[6,-8], f1:28, f2:22}), B:P({t:174, a1:[50,140], a2:[-45,45], l1:[6,-8], l2:[96,4], f1:22, f2:28}),
+    K:[P({t:174, a1:[-45,45], a2:[50,140], l1:[96,4], l2:[6,-8], f1:28, f2:22}), P({t:176, a1:[2,85], a2:[2,85], l1:[26,2], l2:[34,-48], f1:12, f2:30, air:3}),
+       P({t:174, a1:[50,140], a2:[-45,45], l1:[6,-8], l2:[96,4], f1:22, f2:28}), P({t:176, a1:[2,85], a2:[2,85], l1:[34,-48], l2:[26,2], f1:30, f2:12, air:3})], seg:0.18},
   {id:"buttkicks", n:"Hielen naar billen", c:"c", tip:"Ren op de plaats en tik met je hielen tegen je billen. Bovenlijf rechtop.", easy:"Doe het wandelend, één been per keer.",
     A:P({a1:[-30,35], a2:[30,120], l1:[-8,-165], l2:[0,0], air:2}), B:P({a1:[30,120], a2:[-30,35], l1:[0,0], l2:[-8,-165], air:2}),
     K:[P({a1:[-30,35], a2:[30,120], l1:[-8,-165], l2:[0,0], air:2}), P({a1:[-5,30], a2:[5,40], l1:[2,0], l2:[-2,0], air:1}), P({a1:[30,120], a2:[-30,35], l1:[0,0], l2:[-8,-165], air:2}), P({a1:[-5,30], a2:[5,40], l1:[2,0], l2:[-2,0], air:1})], seg:0.2},
   {id:"climbers", n:"Mountain climbers", c:"c", tip:"Steunpositie op je handen. Trek om en om je knie naar je borst, heupen laag.", easy:"Zet je handen op een stoel of bank.",
     A:PL({l1:[72,-58]}), B:PL({l2:[72,-58]}), speed:0.5},
-  {id:"burpees", n:"Burpees", c:"c", jump:1, tip:"Hurk, handen op de grond, spring naar plank, terug naar hurkzit en spring omhoog.", easy:"Stap naar achteren en weer terug, sla de sprong over.",
-    A:P({a1:[170,178], a2:[165,175], air:5}), B:{t:120, a1:[12,6], a2:[6,0], l1:[100,-25], l2:[96,-25]},
-    K:[P({}), {t:150, a1:[30,20], a2:[26,16], l1:[70,-25], l2:[66,-25]}, {t:122, a1:[10,4], a2:[6,0], l1:[108,-22], l2:[104,-22]}, PL({}), {t:122, a1:[10,4], a2:[6,0], l1:[108,-22], l2:[104,-22]}, {t:150, a1:[90,90], a2:[86,86], l1:[70,-25], l2:[66,-25]}, P({a1:[172,178], a2:[168,176], air:8}), P({a1:[120,150], a2:[116,146]})], seg:0.4},
+  {id:"burpees", n:"Burpees", c:"c", jump:1, plant:1, tip:"Hurk, handen op de grond, spring naar plank, terug naar hurkzit en spring omhoog.", easy:"Stap naar achteren en weer terug, sla de sprong over.",
+    A:P({a1:[6,10], a2:[-6,-2]}), B:{t:125, a1:[19,19], a2:[19,19], l1:[112,-28], l2:[112,-28]},
+    K:[P({a1:[6,10], a2:[-6,-2]}), {t:142, a1:[42,42], a2:[38,38], l1:[86,-32], l2:[84,-32]}, {t:125, a1:[19,19], a2:[19,19], l1:[112,-28], l2:[112,-28]},
+       {t:108, a1:[2,2], a2:[0,0], l1:[-72,-72], l2:[-72,-72]}, {t:108, a1:[2,2], a2:[0,0], l1:[-72,-72], l2:[-72,-72]},
+       {t:125, a1:[19,19], a2:[19,19], l1:[112,-28], l2:[112,-28]}, {t:155, a1:[-35,-25], a2:[-32,-22], l1:[72,-30], l2:[70,-30]},
+       P({a1:[158,166], a2:[152,160], l1:[4,-4], l2:[-3,-8], air:7, f1:35, f2:35}), {t:166, a1:[70,80], a2:[66,76], l1:[48,-22], l2:[46,-22]}], seg:0.34},
   {id:"squatjacks", n:"Squat jacks", c:"c", jump:1, view:"front", tip:"Spring van smalle stand naar een brede squat en weer terug. Handen voor je borst.", easy:"Stap opzij naar de squat in plaats van te springen.",
     A:F({a1:[25,-115], a2:[-25,115], l1:[5,0], l2:[-5,0]}), B:F({a1:[25,-115], a2:[-25,115], l1:[78,16], l2:[-78,-16]}),
     K:[F({a1:[25,-115], a2:[-25,115], l1:[8,2], l2:[-8,-2]}), F({a1:[28,-112], a2:[-28,112], l1:[26,14], l2:[-26,-14], air:9}), F({a1:[25,-115], a2:[-25,115], l1:[78,16], l2:[-78,-16]}), F({a1:[28,-112], a2:[-28,112], l1:[26,14], l2:[-26,-14], air:9})], seg:0.32},
@@ -242,8 +248,23 @@ function frameOffset(ex){
   const f=ex.view==="front", j0=joints(settle(ex,frames(ex)[0],f),f), ax=anchorX(ex,j0);
   // kader over een hele bewegingscyclus, met het steunpunt vast
   let x0=1e9,x1=-1e9;
-  for(let i=0;i<=24;i++){ const j=joints(settle(ex,poseAt(ex,i/24),f),f), b=bbox(shiftJ(j,ax-anchorX(ex,j))); x0=Math.min(x0,b.x0); x1=Math.max(x1,b.x1); }
+  for(let i=0;i<=24;i++){ const j=joints(settle(ex,poseAt(ex,i/24),f),f), b=bbox(shiftJ(j,ax-anchorX(ex,j)+plantAt(ex,i/24))); x0=Math.min(x0,b.x0); x1=Math.max(x1,b.x1); }
   return cache[ex.id]={dx:60-(x0+x1)/2, ax, a:j0};
+}
+/* plant: het steunpunt dat op de grond staat (voeten of handen) blijft staan; in de lucht schuift niets. */
+function plantAt(ex,t){
+  if(!ex.plant||!ex.K) return 0;
+  if(!ex._pl){
+    const N=240, KS=["toe1","toe2","heel1","heel2","h1","h2"], tab=[]; let s=0, prev=null;
+    const at=i=>{ const q=settle(ex,poseAt(ex,(i%N)/N),false), j0=joints(q,false), j=shiftJ(j0,-anchorX(ex,j0)), dy=groundDy(j,q.air), c={};
+      for(const k of KS) if(bottomOf(j,k)+dy>=GROUND-0.6) c[k]=j[k][0]; return c; };
+    for(let i=0;i<=N;i++){ const c=at(i);
+      if(prev){ const sh=Object.keys(c).filter(k=>k in prev); if(sh.length) s+=sh.reduce((a,k)=>a+prev[k]-c[k],0)/sh.length; }
+      tab.push(s); prev=c; }
+    const D=tab[N]; for(let i=0;i<=N;i++) tab[i]-=D*i/N;
+    const m=tab.reduce((a,b)=>a+b,0)/tab.length; ex._pl=tab.map(v=>v-m);
+  }
+  const x=((t%1)+1)%1*240, i=Math.floor(x); return lerp(ex._pl[i],ex._pl[i+1],x-i);
 }
 function groundDy(j, air){ return GROUND - bbox(j).y1 - (air||0); }
 
@@ -307,7 +328,7 @@ function poseAt(ex, t){ // t: 0..1 heen-en-terug (A/B) of rondgang door keyframe
 }
 function draw(svg, ex, t){
   const front=ex.view==="front";
-  const q=settle(ex,poseAt(ex,t),front), off=frameOffset(ex), j0=joints(q,front), j=shiftJ(j0,off.ax-anchorX(ex,j0));
+  const q=settle(ex,poseAt(ex,t),front), off=frameOffset(ex), j0=joints(q,front), j=shiftJ(j0,off.ax-anchorX(ex,j0)+plantAt(ex,t));
   const gb=GROUNDBY[ex.id], dy=gb ? GROUND-Math.max(...gb.map(k=>bottomOf(j,k)))-(q.air||0) : groundDy(j,q.air), dx=off.dx;
   const X=p=>`${(p[0]+dx).toFixed(1)},${(p[1]+dy).toFixed(1)}`;
   const side=!front;
@@ -372,7 +393,7 @@ function draw(svg, ex, t){
   set("tie",tie);
   set("nearArm",arm(j.sh1,j.e1,j.w1,j.h1,q.a1));
   const bb=bbox(j);
-  P.shadow.setAttribute("cx",(((bb.x0+bb.x1)/2)+dx).toFixed(1)); P.shadow.setAttribute("rx",Math.max(10,(bb.x1-bb.x0)/2+2).toFixed(1));
+  P.shadow.setAttribute("cx",(((bb.x0+bb.x1)/2)+dx).toFixed(1)); const lift=Math.min(0.4,(q.air||0)*0.035); P.shadow.setAttribute("rx",(Math.max(10,(bb.x1-bb.x0)/2+2)*(1-lift)).toFixed(1)); P.shadow.setAttribute("opacity",(1-lift*1.2).toFixed(2));
 }
 function propShapes(svg, ex){
   if(!ex.prop) return;
